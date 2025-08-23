@@ -44,38 +44,11 @@
       transform: scale(1.1);
     }
 
-    /* Счётчик кликов */
     .click-counter {
       color: white;
       font-size: 1rem;
       margin: 8px 0 0;
       text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
-    }
-
-    /* Красивое всплывающее окно */
-    .toast {
-      visibility: hidden;
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%) scale(0.8);
-      background: rgba(0, 0, 0, 0.85);
-      color: white;
-      padding: 16px 30px;
-      border-radius: 30px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.4s ease;
-      white-space: nowrap;
-      backdrop-filter: blur(5px);
-    }
-    .toast.show {
-      visibility: visible;
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
     }
 
     footer {
@@ -109,9 +82,40 @@
       0% { transform: translateY(0) rotate(45deg); opacity: 1; }
       100% { transform: translateY(-600px) rotate(45deg); opacity: 0; }
     }
+
+    /* Всплывающее окно — внутри body, не влияет на позиционирование */
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: -60px;
+      transform: translateX(-50%) scale(0.9);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 16px 30px;
+      border-radius: 30px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      white-space: nowrap;
+      backdrop-filter: blur(5px);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      bottom: 40px;
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Всплывающее окно — в теле body, но не мешает -->
+  <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
+
   <h1>
     Зефирка моя,<br>
     я тебя люблю ❤️
@@ -127,13 +131,9 @@
 
   <button onclick="handleClick()">Нажми меня</button>
 
-  <!-- Счётчик -->
   <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
 
   <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
-
-  <!-- Всплывающее сообщение -->
-  <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
   <script>
     // === Проверка localStorage с защитой ===
@@ -179,7 +179,7 @@
       isAnimating = true;
 
       toast.classList.remove("show");
-      void toast.offsetWidth;
+      void toast.offsetWidth; // Принудительный сброс
       toast.classList.add("show");
 
       setTimeout(() => {
@@ -190,7 +190,7 @@
       }, 2500);
     }
 
-    // === Клик по кнопке ===
+    // === Клик ===
     function handleClick() {
       count++;
       counterElement.textContent = count;
