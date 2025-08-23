@@ -65,7 +65,7 @@
       box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
       z-index: 1000;
       opacity: 0;
-      transition: all 0.4s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
       white-space: nowrap;
       backdrop-filter: blur(5px);
     }
@@ -120,7 +120,7 @@
   <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
   <script>
-    // === Защита от отсутствия localStorage (Safari в приватном режиме) ===
+    // === Проверка доступности localStorage ===
     const storageAvailable = (type) => {
       try {
         const storage = window[type];
@@ -137,17 +137,13 @@
 
     // === Счётчик ===
     const counterElement = document.getElementById("clickCounter");
-    
-    // Читаем из localStorage, если можно, иначе — 0
     let count = 0;
+
     if (canUseLocalStorage) {
       count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
     }
-
-    // Обновляем отображение
     counterElement.textContent = count;
 
-    // Функция сохранения (с защитой)
     function saveCount(num) {
       if (canUseLocalStorage) {
         try {
@@ -158,24 +154,34 @@
       }
     }
 
+    // === Всплывающее окно (без уезжания) ===
+    const toast = document.getElementById("loveToast");
+    let isToastActive = false; // Защита от дублирования
+
+    function showToast() {
+      // Если уже показывается — не делаем ничего
+      if (isToastActive) return;
+      isToastActive = true;
+
+      // Показываем
+      toast.classList.add("show");
+
+      // Скрываем через 2.5 секунды
+      setTimeout(() => {
+        toast.classList.remove("show");
+        // Делаем доступным для следующего показа
+        setTimeout(() => {
+          isToastActive = false;
+        }, 400); // Ждём окончания transition
+      }, 2500);
+    }
+
     // === Клик по кнопке ===
     function handleClick() {
       count++;
       counterElement.textContent = count;
       saveCount(count);
-      showToast();
-    }
-
-    // === Всплывающее сообщение ===
-    const toast = document.getElementById("loveToast");
-    function showToast() {
-      toast.classList.remove("show");
-      void toast.offsetWidth;
-      toast.classList.add("show");
-
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2500);
+      showToast(); // Теперь безопасно
     }
 
     // === Летающие сердечки ===
