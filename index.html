@@ -50,12 +50,13 @@
       text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
     }
 
-    /* Важно: visibility НЕ используем */
+    /* Всплывающее окно — только transform и opacity */
     .toast {
       position: fixed;
-      bottom: -100px;
       left: 50%;
-      transform: translateX(-50%);
+      bottom: 40px; /* фиксируем положение */
+      transform: translateX(-50%) translateY(20px) scale(0.95);
+      opacity: 0;
       background: rgba(0, 0, 0, 0.85);
       color: white;
       padding: 16px 30px;
@@ -64,10 +65,14 @@
       font-weight: bold;
       box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
       z-index: 1000;
-      opacity: 0;
-      transition: all 0.4s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
       white-space: nowrap;
       backdrop-filter: blur(5px);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
     }
 
     footer {
@@ -149,39 +154,31 @@
       }
     }
 
-    // === Всплывающее окно — НАДЕЖНОЕ ===
+    // === Всплывающее окно — СТАБИЛЬНОЕ ===
     const toast = document.getElementById("loveToast");
-    let toastTimeout = null;
+    let isAnimating = false;
 
     function showToast() {
-      // Если уже показывается — убираем плавно
-      if (toastTimeout) {
-        clearTimeout(toastTimeout);
-        toast.style.opacity = 0;
-        toast.style.bottom = '-100px';
+      if (isAnimating) {
+        // Если уже анимируется — ничего не делаем
+        return;
       }
 
-      // Сбрасываем стиль, чтобы анимация повторилась
-      requestAnimationFrame(() => {
-        toast.style.opacity = 0;
-        toast.style.bottom = '-100px';
-        toast.style.transform = 'translateX(-50%) scale(0.8)';
-        
-        // Показываем
-        requestAnimationFrame(() => {
-          toast.style.transition = 'all 0.4s ease';
-          toast.style.opacity = 1;
-          toast.style.bottom = '40px';
-          toast.style.transform = 'translateX(-50%) scale(1)';
-        });
-      });
+      isAnimating = true;
 
-      // Убираем через 2.5 секунды
-      toastTimeout = setTimeout(() => {
-        toast.style.transition = 'all 0.4s ease';
-        toast.style.opacity = 0;
-        toast.style.bottom = '-100px';
-        toastTimeout = null;
+      // Сбрасываем
+      toast.classList.remove("show");
+
+      // Запускаем анимацию
+      void toast.offsetWidth; // Принудительная перерисовка
+      toast.classList.add("show");
+
+      // Через 2.5 секунды — убираем
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => {
+          isAnimating = false;
+        }, 400); // Ждём окончания transition
       }, 2500);
     }
 
