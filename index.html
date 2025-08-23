@@ -50,12 +50,12 @@
       text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
     }
 
+    /* Важно: visibility НЕ используем */
     .toast {
-      visibility: hidden;
       position: fixed;
-      bottom: 40px;
+      bottom: -100px;
       left: 50%;
-      transform: translateX(-50%) scale(0.8);
+      transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.85);
       color: white;
       padding: 16px 30px;
@@ -65,14 +65,9 @@
       box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
       z-index: 1000;
       opacity: 0;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition: all 0.4s ease;
       white-space: nowrap;
       backdrop-filter: blur(5px);
-    }
-    .toast.show {
-      visibility: visible;
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
     }
 
     footer {
@@ -120,7 +115,7 @@
   <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
   <script>
-    // === Проверка доступности localStorage ===
+    // === Проверка localStorage ===
     const storageAvailable = (type) => {
       try {
         const storage = window[type];
@@ -154,34 +149,48 @@
       }
     }
 
-    // === Всплывающее окно (без уезжания) ===
+    // === Всплывающее окно — НАДЕЖНОЕ ===
     const toast = document.getElementById("loveToast");
-    let isToastActive = false; // Защита от дублирования
+    let toastTimeout = null;
 
     function showToast() {
-      // Если уже показывается — не делаем ничего
-      if (isToastActive) return;
-      isToastActive = true;
+      // Если уже показывается — убираем плавно
+      if (toastTimeout) {
+        clearTimeout(toastTimeout);
+        toast.style.opacity = 0;
+        toast.style.bottom = '-100px';
+      }
 
-      // Показываем
-      toast.classList.add("show");
+      // Сбрасываем стиль, чтобы анимация повторилась
+      requestAnimationFrame(() => {
+        toast.style.opacity = 0;
+        toast.style.bottom = '-100px';
+        toast.style.transform = 'translateX(-50%) scale(0.8)';
+        
+        // Показываем
+        requestAnimationFrame(() => {
+          toast.style.transition = 'all 0.4s ease';
+          toast.style.opacity = 1;
+          toast.style.bottom = '40px';
+          toast.style.transform = 'translateX(-50%) scale(1)';
+        });
+      });
 
-      // Скрываем через 2.5 секунды
-      setTimeout(() => {
-        toast.classList.remove("show");
-        // Делаем доступным для следующего показа
-        setTimeout(() => {
-          isToastActive = false;
-        }, 400); // Ждём окончания transition
+      // Убираем через 2.5 секунды
+      toastTimeout = setTimeout(() => {
+        toast.style.transition = 'all 0.4s ease';
+        toast.style.opacity = 0;
+        toast.style.bottom = '-100px';
+        toastTimeout = null;
       }, 2500);
     }
 
-    // === Клик по кнопке ===
+    // === Клик ===
     function handleClick() {
       count++;
       counterElement.textContent = count;
       saveCount(count);
-      showToast(); // Теперь безопасно
+      showToast();
     }
 
     // === Летающие сердечки ===
