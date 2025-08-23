@@ -2,12 +2,14 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Для моей Зефирки</title>
   <style>
+    /* === Ключевое: используем dvh вместо vh === */
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100dvh; /* dynamic viewport height */
+      max-height: 100dvh;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -18,7 +20,23 @@
       overflow: hidden;
       color: white;
       text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+
+      /* Блокируем проскролл "вниз" на iOS */
+      overscroll-behavior: none;
     }
+
+    /* Ограничиваем контент, чтобы не вылезал */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
     h1 {
       font-size: 2.5rem;
       margin: 0 0 15px;
@@ -50,12 +68,12 @@
       text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
     }
 
-    /* Всплывающее окно — только transform и opacity */
+    /* Всплывающее окно — только transform, без влияния на layout */
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 40px; /* фиксируем положение */
-      transform: translateX(-50%) translateY(20px) scale(0.95);
+      bottom: 40px;
+      transform: translateX(-50%) translateY(20px) scale(0.9);
       opacity: 0;
       background: rgba(0, 0, 0, 0.85);
       color: white;
@@ -68,6 +86,7 @@
       transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
       white-space: nowrap;
       backdrop-filter: blur(5px);
+      pointer-events: none; /* чтобы не мешало кликам */
     }
 
     .toast.show {
@@ -81,6 +100,8 @@
       font-size: 1rem;
       max-width: 320px;
     }
+
+    /* Летающие сердечки */
     .heart {
       position: absolute;
       width: 20px;
@@ -89,6 +110,7 @@
       transform: rotate(45deg);
       animation: floatUp 4s linear infinite;
       opacity: 0.7;
+      pointer-events: none;
     }
     .heart::before, .heart::after {
       content: "";
@@ -107,16 +129,19 @@
   </style>
 </head>
 <body>
-  <h1>Зефирка моя, я тебя люблю ❤️</h1>
-  <p>Ты — самое лучшее, что есть в моей жизни.<br>
-  Спасибо тебе, что ты есть в моей жизни 💕</p>
+  <div class="content">
+    <h1>Зефирка моя, я тебя люблю ❤️</h1>
+    <p>Ты — самое лучшее, что есть в моей жизни.<br>
+    Спасибо тебе, что ты есть в моей жизни 💕</p>
 
-  <button onclick="handleClick()">Нажми меня</button>
+    <button onclick="handleClick()">Нажми меня</button>
 
-  <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
+    <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
 
-  <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+    <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+  </div>
 
+  <!-- Всплывающее окно -->
   <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
   <script>
@@ -154,31 +179,23 @@
       }
     }
 
-    // === Всплывающее окно — СТАБИЛЬНОЕ ===
+    // === Всплывающее окно — стабильное ===
     const toast = document.getElementById("loveToast");
     let isAnimating = false;
 
     function showToast() {
-      if (isAnimating) {
-        // Если уже анимируется — ничего не делаем
-        return;
-      }
-
+      if (isAnimating) return;
       isAnimating = true;
 
-      // Сбрасываем
       toast.classList.remove("show");
-
-      // Запускаем анимацию
-      void toast.offsetWidth; // Принудительная перерисовка
+      void toast.offsetWidth; // Сброс
       toast.classList.add("show");
 
-      // Через 2.5 секунды — убираем
       setTimeout(() => {
         toast.classList.remove("show");
         setTimeout(() => {
           isAnimating = false;
-        }, 400); // Ждём окончания transition
+        }, 400);
       }, 2500);
     }
 
