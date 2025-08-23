@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Для моей Зефирки</title>
   <style>
-    /* === Полный контроль над размером === */
     * {
       margin: 0;
       padding: 0;
@@ -32,7 +31,78 @@
       text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
     }
 
-    /* Контент — центрирован */
+    /* Индикатор сердечка сверху */
+    .heart-progress-container {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+
+    .heart-outline {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      background: red;
+      transform: rotate(45deg);
+      border-radius: 10px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .heart-outline::before,
+    .heart-outline::after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: red;
+      border-radius: 50%;
+    }
+
+    .heart-outline::before {
+      top: -20px;
+      left: 0;
+    }
+
+    .heart-outline::after {
+      left: -20px;
+      top: 0;
+    }
+
+    .heart-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ff6b81;
+      border-radius: inherit;
+      z-index: 1;
+      transition: none; /* Убираем плавность, будем управлять вручную */
+      transform-origin: bottom;
+    }
+
+    /* Анимация "всплеск" при клике */
+    .heart-outline.animate {
+      animation: pulse 0.6s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0% { transform: rotate(45deg) scale(1); }
+      50% { transform: rotate(45deg) scale(1.2); }
+      100% { transform: rotate(45deg) scale(1); }
+    }
+
+    /* Контент */
     .content {
       display: flex;
       flex-direction: column;
@@ -86,11 +156,11 @@
       z-index: 1;
     }
 
-    /* Всплывающее окно — внутри body, но ведёт себя как fixed */
+    /* Всплывающее окно */
     .toast {
       position: absolute;
       left: 50%;
-      bottom: -100px; /* изначально скрыто */
+      bottom: -100px;
       transform: translateX(-50%) scale(0.9);
       opacity: 0;
       background: rgba(0, 0, 0, 0.85);
@@ -144,6 +214,13 @@
   </style>
 </head>
 <body>
+  <!-- Сердечко-индикатор -->
+  <div class="heart-progress-container">
+    <div class="heart-outline">
+      <div class="heart-fill" id="heartFill"></div>
+    </div>
+  </div>
+
   <div class="content">
     <h1>Зефирка моя, я тебя люблю ❤️</h1>
     <p>Ты — самое лучшее, что есть в моей жизни.<br>
@@ -160,13 +237,12 @@
   <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
   <script>
-    // === Фиксируем высоту body под экран (для iOS) ===
+    // === Фиксация высоты экрана (iOS) ===
     function setBodyHeight() {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
       document.body.style.height = `calc(var(--vh, 1vh) * 100)`;
     }
-
     setBodyHeight();
     window.addEventListener('resize', setBodyHeight);
 
@@ -186,12 +262,34 @@
     const canUseLocalStorage = storageAvailable('localStorage');
 
     const counterElement = document.getElementById("clickCounter");
+    const heartFill = document.getElementById("heartFill");
+    const heartOutline = document.querySelector(".heart-outline");
+    const MAX_CLICKS = 10000;
+
     let count = 0;
 
     if (canUseLocalStorage) {
       count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
     }
     counterElement.textContent = count;
+
+    // Обновляем заполнение с анимацией
+    function updateHeartFill() {
+      const progress = Math.min(count / MAX_CLICKS, 1);
+      const targetHeight = `${progress * 100}%`;
+
+      // Анимация роста
+      heartFill.style.transition = 'height 0.4s ease-out';
+      heartFill.style.height = targetHeight;
+
+      // Анимация "пульс"
+      heartOutline.classList.remove("animate");
+      void heartOutline.offsetWidth; // сброс
+      heartOutline.classList.add("animate");
+    }
+
+    // Инициализация
+    updateHeartFill();
 
     function saveCount(num) {
       if (canUseLocalStorage) {
@@ -203,7 +301,7 @@
       }
     }
 
-    // === Всплывающее окно — без сдвигов ===
+    // === Всплывающее окно ===
     const toast = document.getElementById("loveToast");
     let isAnimating = false;
 
@@ -223,10 +321,12 @@
       }, 2500);
     }
 
+    // === Клик ===
     function handleClick() {
       count++;
       counterElement.textContent = count;
       saveCount(count);
+      updateHeartFill(); // плавное + пульсирующее обновление
       showToast();
     }
 
