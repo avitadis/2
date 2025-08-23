@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Для моей Зефирки</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: url("background.jpg") no-repeat center center/cover;
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      overflow: hidden;
+      color: white;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 15px;
+    }
+    p {
+      font-size: 1.2rem;
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      background: white;
+      color: #ff4b5c;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    .click-counter {
+      color: white;
+      font-size: 1rem;
+      margin: 8px 0;
+      text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
+    }
+
+    .toast {
+      visibility: hidden;
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.85);
+      color: white;
+      padding: 16px 30px;
+      border-radius: 30px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.4s ease;
+      white-space: nowrap;
+      backdrop-filter: blur(5px);
+    }
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 1rem;
+      max-width: 320px;
+    }
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      transform: rotate(45deg);
+      animation: floatUp 4s linear infinite;
+      opacity: 0.7;
+    }
+    .heart::before, .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: red;
+      border-radius: 50%;
+    }
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: -10px; top: 0; }
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateY(-600px) rotate(45deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Зефирка моя, я тебя люблю ❤️</h1>
+  <p>Ты — самое лучшее, что есть в моей жизни.<br>
+  Спасибо тебе, что ты есть в моей жизни 💕</p>
+
+  <button onclick="handleClick()">Нажми меня</button>
+
+  <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
+
+  <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+
+  <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
+
+  <script>
+    // === Защита от отсутствия localStorage (Safari в приватном режиме) ===
+    const storageAvailable = (type) => {
+      try {
+        const storage = window[type];
+        const x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    const canUseLocalStorage = storageAvailable('localStorage');
+
+    // === Счётчик ===
+    const counterElement = document.getElementById("clickCounter");
+    
+    // Читаем из localStorage, если можно, иначе — 0
+    let count = 0;
+    if (canUseLocalStorage) {
+      count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
+    }
+
+    // Обновляем отображение
+    counterElement.textContent = count;
+
+    // Функция сохранения (с защитой)
+    function saveCount(num) {
+      if (canUseLocalStorage) {
+        try {
+          localStorage.setItem("zeffirkaClicks", num);
+        } catch (e) {
+          console.warn("Не удалось сохранить в localStorage", e);
+        }
+      }
+    }
+
+    // === Клик по кнопке ===
+    function handleClick() {
+      count++;
+      counterElement.textContent = count;
+      saveCount(count);
+      showToast();
+    }
+
+    // === Всплывающее сообщение ===
+    const toast = document.getElementById("loveToast");
+    function showToast() {
+      toast.classList.remove("show");
+      void toast.offsetWidth;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+
+    // === Летающие сердечки ===
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.style.left = Math.random() * window.innerWidth + "px";
+      heart.style.top = window.innerHeight + "px";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 4000);
+    }
+    setInterval(createHeart, 500);
+  </script>
+</body>
+</html>
