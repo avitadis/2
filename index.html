@@ -79,26 +79,28 @@
       top: 0;
     }
 
+    /* Заливка — плавная анимация */
     .heart-fill {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: #ff6b81;
+      background: #ff4b5c;
       border-radius: inherit;
       z-index: 1;
-      transition: none; /* Убираем плавность, будем управлять вручную */
+      /* Ключ: плавное изменение высоты */
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       transform-origin: bottom;
     }
 
     /* Анимация "всплеск" при клике */
     .heart-outline.animate {
-      animation: pulse 0.6s ease-in-out;
+      animation: pulse 0.6s ease-out;
     }
 
     @keyframes pulse {
       0% { transform: rotate(45deg) scale(1); }
-      50% { transform: rotate(45deg) scale(1.2); }
+      50% { transform: rotate(45deg) scale(1.15); }
       100% { transform: rotate(45deg) scale(1); }
     }
 
@@ -217,7 +219,7 @@
   <!-- Сердечко-индикатор -->
   <div class="heart-progress-container">
     <div class="heart-outline">
-      <div class="heart-fill" id="heartFill"></div>
+      <div class="heart-fill" id="heartFill" style="height: 0%"></div>
     </div>
   </div>
 
@@ -273,22 +275,14 @@
     }
     counterElement.textContent = count;
 
-    // Обновляем заполнение с анимацией
+    // Обновляем заполнение
     function updateHeartFill() {
-      const progress = Math.min(count / MAX_CLICKS, 1);
+      const progress = Math.min(count / MAX_CLICKS, 1); // 0...1
       const targetHeight = `${progress * 100}%`;
-
-      // Анимация роста
-      heartFill.style.transition = 'height 0.4s ease-out';
       heartFill.style.height = targetHeight;
-
-      // Анимация "пульс"
-      heartOutline.classList.remove("animate");
-      void heartOutline.offsetWidth; // сброс
-      heartOutline.classList.add("animate");
     }
 
-    // Инициализация
+    // Вызываем при старте
     updateHeartFill();
 
     function saveCount(num) {
@@ -326,7 +320,13 @@
       count++;
       counterElement.textContent = count;
       saveCount(count);
-      updateHeartFill(); // плавное + пульсирующее обновление
+      updateHeartFill(); // Плавное изменение высоты (CSS transition)
+      
+      // Анимация подпрыгивания
+      heartOutline.classList.remove("animate");
+      void heartOutline.offsetWidth; // Принудительный сброс
+      heartOutline.classList.add("animate");
+      
       showToast();
     }
 
