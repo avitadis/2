@@ -1,143 +1,487 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Для моей Зефирки 💖</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Для моей Зефирки</title>
 <style>
-  body { margin:0; font-family:"Segoe UI", sans-serif; background:url("background.jpg") no-repeat center center/cover; color:white; text-align:center; overflow-x:hidden;}
-  nav{display:flex;justify-content:center;gap:15px;background:#ff4b5c;padding:10px 0;position:sticky;top:0;z-index:100;}
-  nav button{padding:10px 20px;border:none;border-radius:25px;background:white;color:#ff4b5c;font-weight:bold;cursor:pointer;transition:.3s;}
-  nav button:hover{background:#ffe5e9;}
-  nav button.active{background:#fff0f2;border:2px solid #ff4b5c;}
-  .tab{display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;min-height:80vh;}
-  .tab.active{display:flex;}
-  h1{font-size:2.5rem;margin:0 0 15px;text-shadow:2px 2px 10px rgba(0,0,0,0.6);}
-  p{font-size:1.2rem;max-width:350px;margin-bottom:20px;white-space:pre-line;text-shadow:1px 1px 5px rgba(0,0,0,0.6);}
-  .main-btn{padding:12px 24px;font-size:1rem;border:none;border-radius:25px;background:white;color:#ff4b5c;font-weight:bold;cursor:pointer;transition:transform .3s;}
-  .main-btn:hover{transform:scale(1.1);}
-  .click-counter{font-size:1rem;margin:10px 0;text-shadow:1px 1px 5px rgba(0,0,0,0.6);}
-  footer{margin-top:20px;font-size:1rem;max-width:350px;}
-  .heart{position:absolute;width:20px;height:20px;background:red;transform:rotate(45deg);animation:floatUp 4s linear infinite;opacity:.7;}
-  .heart::before,.heart::after{content:"";position:absolute;width:20px;height:20px;background:red;border-radius:50%;}
-  .heart::before{top:-10px;left:0;}
-  .heart::after{left:-10px;top:0;}
-  @keyframes floatUp{0%{transform:translateY(0) rotate(45deg);opacity:1}100%{transform:translateY(-600px) rotate(45deg);opacity:0}}
-  .toast{position:absolute;left:50%;bottom:-60px;transform:translateX(-50%) scale(0.9);background:rgba(0,0,0,.85);color:white;padding:16px 30px;border-radius:30px;font-size:1.3rem;font-weight:bold;box-shadow:0 6px 20px rgba(255,100,150,.5);z-index:1000;opacity:0;transition:all .4s cubic-bezier(.25,.8,.25,1);white-space:nowrap;backdrop-filter:blur(5px);pointer-events:none;}
-  .toast.show{bottom:40px;transform:translateX(-50%) scale(1);opacity:1;}
-  #gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;width:90%;margin-top:20px;}
-  .photo{position:relative;}
-  .photo img{width:100%;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:transform .3s;}
-  .photo img:hover{transform:scale(1.05);}
-  .delete-btn{position:absolute;top:5px;right:5px;padding:5px 8px;font-size:12px;background:rgba(255,0,50,.8);color:white;border:none;border-radius:8px;cursor:pointer;transition:.2s;}
-  .delete-btn:hover{background:rgba(255,0,50,1);}
-  .upload-box{margin:20px auto;padding:20px;border:2px dashed #ff4b5c;border-radius:20px;max-width:400px;background:#fff5f6;color:#333;word-break:break-word;}
-  input[type=file]{display:none;}
-  label.upload-btn{display:inline-block;padding:12px 24px;background:#ff4b5c;color:white;border-radius:25px;font-weight:bold;cursor:pointer;margin-top:10px;transition:background .3s;}
-  label.upload-btn:hover{background:#e53b4c;}
-  #uploadStatus p{margin:5px 0;color:#333;font-weight:bold;word-break:break-word;}
+  :root{
+    --accent:#ff4b5c;
+    --accent-dark:#e53b4c;
+    --glass: rgba(255,255,255,0.12);
+    --glass-hover: rgba(255,255,255,0.22);
+  }
+
+  html,body{height:100%;margin:0;}
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: url("background.jpg") no-repeat center center/cover;
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* NAV - убрал сплошную подложку, кнопки полупрозрачные */
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    /* прозрачный фон, пусть видно background.jpg */
+    background: transparent;
+    backdrop-filter: blur(4px);
+  }
+  nav button {
+    padding: 10px 18px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    background: var(--glass);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .18s ease;
+    min-width: 92px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    text-transform:none;
+  }
+  nav button:hover { background: var(--glass-hover); transform: translateY(-2px); }
+  nav button.active { outline: 2px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.18); }
+
+  /* Tabs */
+  .tab { display:none; flex-direction:column; align-items:center; justify-content:flex-start; padding:24px 12px 60px; min-height: calc(100vh - 72px); box-sizing:border-box; }
+  .tab.active{ display:flex; }
+
+  /* Главная */
+  h1 { font-size: 2.4rem; margin: 10px 0 12px; text-shadow: 2px 2px 12px rgba(0,0,0,0.6); line-height:1.05; }
+  .poem {
+    font-size: 1.05rem;
+    max-width: 720px;
+    margin: 0 12px 18px;
+    white-space: pre-line;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.6);
+    color: #fff;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06));
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+  .main-btn {
+    padding: 12px 26px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 25px;
+    background: white;
+    color: var(--accent);
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .18s ease;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  }
+  .main-btn:hover { transform: scale(1.03); }
+
+  .click-counter { font-size: 1rem; margin: 10px 0; text-shadow: 1px 1px 5px rgba(0,0,0,0.6); }
+  footer { margin-top: 18px; font-size: 0.98rem; max-width: 760px; color:#fff; opacity:0.95; }
+
+  /* Hearts */
+  .heart {
+    position: absolute;
+    width: 18px; height: 18px;
+    background: var(--accent);
+    transform: rotate(45deg);
+    animation: floatUp 4s linear infinite;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .heart::before, .heart::after { content:""; position:absolute; width:18px; height:18px; background:var(--accent); border-radius:50%; }
+  .heart::before { top:-9px; left:0; } .heart::after { left:-9px; top:0; }
+  @keyframes floatUp { 0% { transform: translateY(0) rotate(45deg); opacity:1; } 100% { transform: translateY(-620px) rotate(45deg); opacity:0; } }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: -90px;
+    transform: translateX(-50%) scale(0.95);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 28px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    z-index: 120;
+    opacity: 0;
+    transition: all .35s cubic-bezier(.2,.9,.2,1);
+    white-space: nowrap;
+  }
+  .toast.show { bottom: 36px; opacity: 1; transform: translateX(-50%) scale(1); }
+
+  /* Upload box */
+  .upload-box {
+    margin: 18px auto;
+    padding: 18px;
+    border: 2px dashed var(--accent);
+    border-radius: 14px;
+    max-width: 720px;
+    background: rgba(255,245,246,0.9);
+    color: #222;
+    box-sizing: border-box;
+  }
+  input[type="file"] { display:none; }
+  label.upload-btn {
+    display:inline-block;
+    padding: 10px 18px;
+    background: var(--accent);
+    color: white;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  label.upload-btn:hover { background: var(--accent-dark); }
+
+  #uploadStatus { margin-top:12px; text-align:left; }
+  .status-item {
+    margin: 8px 0;
+    color: #222;
+    font-weight: 700;
+    background: rgba(255,255,255,0.96);
+    padding: 10px 12px;
+    border-radius: 10px;
+    overflow-wrap:anywhere;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .status-left { flex:1; text-align:left; word-break:break-word; color:#111; }
+  .status-right { min-width:70px; text-align:right; color:#555; font-weight:700; }
+
+  /* Gallery grid */
+  #gallery {
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    width: 92%;
+    max-width: 1100px;
+    margin: 14px auto 40px;
+    box-sizing: border-box;
+  }
+  .photo {
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+    background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04));
+    box-shadow: 0 8px 26px rgba(0,0,0,0.35);
+  }
+  .photo img{ display:block; width:100%; height:auto; object-fit:cover; }
+  .photo .caption {
+    position:absolute; left:8px; bottom:8px; right:8px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.55));
+    color:white; padding:8px 10px; border-radius:10px;
+    display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:0.92rem;
+  }
+  .remove-btn {
+    background: rgba(255,255,255,0.12);
+    color: white; border: none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:700;
+  }
+  .remove-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* small screens */
+  @media (max-width:640px){
+    h1{font-size:1.9rem;}
+    .poem{font-size:0.98rem; padding:10px;}
+    .upload-box { padding:12px; }
+    nav{gap:8px;}
+    nav button{min-width:74px;padding:8px 12px;}
+  }
 </style>
 </head>
 <body>
 
 <nav>
   <button class="tab-btn active" data-tab="home">Главная</button>
-  <button class="tab-btn" data-tab="galleryTab">Галерея</button>
-  <button class="tab-btn" data-tab="uploadTab">Загрузка фото</button>
+  <button class="tab-btn" data-tab="gallery">Галерея</button>
+  <button class="tab-btn" data-tab="upload">Загрузка</button>
 </nav>
 
+<!-- Toast -->
 <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
+<!-- HOME -->
 <div id="home" class="tab active">
   <h1>Зефирка моя,<br> я тебя люблю ❤️</h1>
-  <p>Спасибо тебе, что ты есть в моей жизни 💕</p>
+  <div class="poem">
+Я о тебе, кто мне всего дороже,
+боюсь писать.
+Вдруг кто-нибудь, любя,
+заговорит с другой,
+любимой тоже,
+словами, что нашёл
+я для тебя.
+Спасибо тебе, что ты есть в моей жизни 💕
+  </div>
+
   <button class="main-btn" id="mainBtn">Нажми меня</button>
   <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
   <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
 </div>
 
-<div id="galleryTab" class="tab">
-  <div id="gallery"></div>
+<!-- GALLERY -->
+<div id="gallery" class="tab" aria-live="polite">
+  <!-- Заполняется скриптом -->
 </div>
 
-<div id="uploadTab" class="tab">
+<!-- UPLOAD -->
+<div id="upload" class="tab">
   <div class="upload-box">
-    <h3>Выбери фото для загрузки 💖</h3>
-    <input type="file" id="fileInput" accept="image/*" multiple>
+    <h3 style="margin:0 0 8px 0;color:#222;">Выбери фото для загрузки 💖</h3>
+    <input type="file" id="fileInput" accept="image/*" multiple />
     <label for="fileInput" class="upload-btn">Выбрать фото</label>
-    <div id="uploadStatus"></div>
+    <div id="uploadStatus" aria-live="polite"></div>
+    <p style="margin-top:10px;color:#333;font-size:0.95rem;">Фото загружаются на imgbb и автоматически сохраняются в базе (Supabase). Удалять фото можно здесь — они удалятся и из базы.</p>
   </div>
 </div>
 
-<script>
-const API_KEY="876c7823f9f0a390dbd7586dca84c168";
+<script type="module">
+/* -----------------------
+   Supabase + IMGBB integration
+   ----------------------- */
 
-// вкладки
-const tabBtns=document.querySelectorAll(".tab-btn");
-const tabs=document.querySelectorAll(".tab");
-tabBtns.forEach(btn=>{btn.addEventListener("click",()=>{
-  tabBtns.forEach(b=>b.classList.remove("active"));
-  tabs.forEach(t=>t.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById(btn.dataset.tab).classList.add("active");
-});});
+/* Supabase credentials — использованы те, что ты прислал */
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// счетчик
-const counterElement=document.getElementById("clickCounter");
-let count=parseInt(localStorage.getItem("zeffirkaClicks"))||0;
-counterElement.textContent=count;
-const toast=document.getElementById("loveToast");
-let isAnimating=false;
-function showToast(){if(isAnimating)return;isAnimating=true;toast.classList.remove("show");void toast.offsetWidth;toast.classList.add("show");setTimeout(()=>{toast.classList.remove("show");setTimeout(()=>{isAnimating=false;},400);},2500);}
-document.getElementById("mainBtn").addEventListener("click",()=>{count++;counterElement.textContent=count;localStorage.setItem("zeffirkaClicks",count);showToast();});
+const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
 
-// сердечки
-function createHeart(){const heart=document.createElement("div");heart.className="heart";heart.style.left=Math.random()*window.innerWidth+"px";heart.style.top=window.innerHeight+"px";document.body.appendChild(heart);setTimeout(()=>heart.remove(),4000);}
-setInterval(createHeart,500);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// галерея
-const gallery=document.getElementById("gallery");
-const photos=[];
-function addPhoto(url, delete_url){
-  const div=document.createElement("div");
-  div.className="photo";
-  const img=document.createElement("img"); img.src=url;
-  const btn=document.createElement("button"); btn.className="delete-btn"; btn.textContent="Удалить";
-  btn.addEventListener("click", async ()=>{
-    if(!confirm("Удалить это фото?")) return;
-    try{
-      await fetch(delete_url); 
-      gallery.removeChild(div);
-    }catch(e){alert("Ошибка при удалении")}}
-  );
-  div.appendChild(img); div.appendChild(btn);
-  gallery.appendChild(div);
+/* IMGBB API key (тот, что у тебя был) */
+const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
+
+/* Tabs behavior */
+const tabBtns = document.querySelectorAll(".tab-btn");
+const tabs = document.querySelectorAll(".tab");
+tabBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    tabBtns.forEach(b => b.classList.remove("active"));
+    tabs.forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    const targetId = btn.dataset.tab;
+    const target = document.getElementById(targetId);
+    if (target) target.classList.add("active");
+    // scroll to top of tab to avoid weird visual jump
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+/* Click counter + toast logic */
+const counterElement = document.getElementById("clickCounter");
+let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
+counterElement.textContent = count;
+
+const toast = document.getElementById("loveToast");
+let toastAnimating = false;
+function showToast(){
+  if(toastAnimating) return;
+  toastAnimating = true;
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.classList.add("show");
+  setTimeout(()=>{ toast.classList.remove("show"); setTimeout(()=>{ toastAnimating=false; }, 380); }, 2400);
 }
 
-// загрузка
-const fileInput=document.getElementById("fileInput");
-const statusDiv=document.getElementById("uploadStatus");
-
-fileInput.addEventListener("change", async ()=>{
-  const files=fileInput.files;
-  if(!files.length) return;
-  for(const file of files){
-    const formData=new FormData();
-    formData.append("image",file);
-    const statusItem=document.createElement("p");
-    statusItem.textContent=file.name+": 0%";
-    statusDiv.appendChild(statusItem);
-    try{
-      const res=await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`,{method:"POST",body:formData});
-      const data=await res.json();
-      if(data.success){
-        statusItem.textContent=file.name+": Загружено!";
-        addPhoto(data.data.url,data.data.delete_url);
-      }else{statusItem.textContent=file.name+": Ошибка";}
-    }catch(e){console.error(e);statusItem.textContent=file.name+": Ошибка сети";}
-  }
-  fileInput.value="";
+document.getElementById("mainBtn").addEventListener("click", ()=>{
+  count++;
+  counterElement.textContent = count;
+  localStorage.setItem("zeffirkaClicks", count);
+  showToast();
 });
+
+/* Hearts */
+function createHeart(){
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.style.left = Math.random() * (window.innerWidth - 40) + "px";
+  heart.style.top = (window.innerHeight + 20) + "px";
+  document.body.appendChild(heart);
+  setTimeout(()=> heart.remove(), 4200);
+}
+setInterval(createHeart, 520);
+
+/* Gallery utilities */
+const gallery = document.getElementById("gallery");
+
+function createPhotoElement(photo){
+  // photo: { id, url, name, uploaded_at }
+  const wrapper = document.createElement("div");
+  wrapper.className = "photo";
+
+  const img = document.createElement("img");
+  img.src = photo.url;
+  img.alt = photo.name || "Фото";
+  img.loading = "lazy";
+
+  const caption = document.createElement("div");
+  caption.className = "caption";
+
+  const nameSpan = document.createElement("div");
+  nameSpan.textContent = photo.name || "";
+
+  const rightGroup = document.createElement("div");
+
+  const dateSpan = document.createElement("div");
+  dateSpan.style.fontSize = "0.8rem";
+  dateSpan.style.opacity = "0.9";
+  try {
+    dateSpan.textContent = new Date(photo.uploaded_at).toLocaleString();
+  } catch(e){ dateSpan.textContent = ""; }
+
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "remove-btn";
+  removeBtn.textContent = "Удалить";
+  removeBtn.addEventListener("click", async (ev) => {
+    ev.stopPropagation();
+    if(!confirm("Удалить это фото из галереи и из базы?")) return;
+    try {
+      // delete from supabase
+      const { error } = await supabase.from("photos").delete().eq("id", photo.id);
+      if (error) throw error;
+      // remove from DOM
+      wrapper.remove();
+    } catch (err) {
+      console.error("Supabase delete error:", err);
+      alert("Ошибка при удалении (см. консоль).");
+    }
+  });
+
+  rightGroup.appendChild(dateSpan);
+  rightGroup.appendChild(removeBtn);
+
+  caption.appendChild(nameSpan);
+  caption.appendChild(rightGroup);
+
+  wrapper.appendChild(img);
+  wrapper.appendChild(caption);
+
+  return wrapper;
+}
+
+/* Load gallery from Supabase */
+async function loadGallery(){
+  gallery.innerHTML = ""; // clear
+  try {
+    const { data, error } = await supabase
+      .from("photos")
+      .select("id,url,name,uploaded_at")
+      .order("uploaded_at", { ascending: false });
+    if (error) throw error;
+    if (Array.isArray(data)) {
+      data.forEach(photo => {
+        gallery.appendChild(createPhotoElement(photo));
+      });
+    }
+  } catch (err) {
+    console.error("Error loading gallery:", err);
+    const errMsg = document.createElement("div");
+    errMsg.style.color = "rgba(255,255,255,0.9)";
+    errMsg.style.margin = "12px";
+    errMsg.textContent = "Не удалось загрузить галерею (смотрите консоль).";
+    gallery.appendChild(errMsg);
+  }
+}
+
+/* Initial load */
+loadGallery();
+
+/* Upload handling to IMGBB + insert to Supabase */
+const fileInput = document.getElementById("fileInput");
+const statusDiv = document.getElementById("uploadStatus");
+
+fileInput.addEventListener("change", async () => {
+  const files = Array.from(fileInput.files || []);
+  if (!files.length) return;
+
+  for (const file of files) {
+    // status item
+    const statusItem = document.createElement("div");
+    statusItem.className = "status-item";
+    const left = document.createElement("div"); left.className = "status-left"; left.textContent = file.name;
+    const right = document.createElement("div"); right.className = "status-right"; right.textContent = "0%";
+    statusItem.appendChild(left); statusItem.appendChild(right);
+    statusDiv.appendChild(statusItem);
+
+    // build form data
+    const form = new FormData();
+    form.append("image", file);
+
+    try {
+      await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `https://api.imgbb.com/1/upload?key=${encodeURIComponent(IMGBB_API_KEY)}`);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            right.textContent = pct + "%";
+          }
+        };
+
+        xhr.onload = async () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const resp = JSON.parse(xhr.responseText);
+              if (resp && resp.success && resp.data && resp.data.url) {
+                right.textContent = "Загружено";
+                // save to supabase
+                try {
+                  const { data, error } = await supabase
+                    .from("photos")
+                    .insert([{ url: resp.data.url, name: file.name, uploaded_at: new Date().toISOString() }])
+                    .select()
+                    .single();
+                  if (error) throw error;
+                  // add to gallery at top
+                  gallery.prepend(createPhotoElement(data));
+                } catch (dbErr) {
+                  console.error("Supabase insert error:", dbErr);
+                  right.textContent = "Ошибка записи";
+                }
+                resolve();
+              } else {
+                right.textContent = "Ошибка";
+                reject(new Error("Bad response from imgbb"));
+              }
+            } catch (err) {
+              right.textContent = "Ошибка";
+              reject(err);
+            }
+          } else {
+            right.textContent = "Ошибка";
+            reject(new Error("HTTP " + xhr.status));
+          }
+        };
+
+        xhr.onerror = () => { right.textContent = "Ошибка сети"; reject(new Error("Network error")); };
+        xhr.send(form);
+      });
+    } catch (err) {
+      console.error("Upload error:", err);
+      // keep status showing error
+    }
+  }
+
+  // clear input so same file can be chosen again if needed
+  fileInput.value = "";
+});
+
+/* Accessibility: focus first tab button initially */
+document.querySelector(".tab-btn")?.focus();
+
 </script>
 
 </body>
