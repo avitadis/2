@@ -177,30 +177,30 @@
 
     /* Загрузка */
     .upload-box {
-      background: rgba(255, 255, 255, 0.15); /* Уменьшил непрозрачность */
+      background: rgba(0, 0, 0, 0.15); /* Ещё более прозрачный фон */
       backdrop-filter: blur(4px);
-      color: white; /* Белый текст */
+      color: white;
       border-radius: 12px;
-      padding: 20px 15px; /* Уменьшил отступы */
-      max-width: 500px;
+      padding: 15px; /* Уменьшенные отступы */
+      max-width: 400px; /* Уменьшенная ширина */
       margin: 0 auto;
       text-align: center;
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .upload-btn {
       display: inline-block;
-      padding: 10px 20px;
-      background: rgba(255, 75, 92, 0.85); /* Прозрачный акцентный цвет */
+      padding: 8px 16px; /* Меньше отступов */
+      background: rgba(255, 75, 92, 0.85);
       color: white;
-      border-radius: 8px;
+      border-radius: 6px; /* Меньше скругления */
       font-weight: 700;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 8px; /* Меньше отступ сверху */
+      font-size: 0.95rem; /* Меньший шрифт */
       transition: background 0.2s;
     }
 
@@ -209,9 +209,9 @@
     }
 
     #uploadStatus {
-      margin-top: 15px;
+      margin-top: 10px; /* Меньше отступ сверху */
       text-align: left;
-      max-height: 200px;
+      max-height: 150px; /* Меньшая высота */
       overflow-y: auto;
       padding-right: 5px;
     }
@@ -219,10 +219,11 @@
     .status-item {
       background: rgba(255, 255, 255, 0.1);
       color: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      margin: 8px 0;
-      border-left: 3px solid #ff4b5c;
+      padding: 6px 10px; /* Меньше отступов */
+      border-radius: 6px; /* Меньше скругления */
+      margin: 6px 0; /* Меньше отступов */
+      border-left: 2px solid #ff4b5c;
+      font-size: 0.85rem; /* Меньший шрифт */
     }
 
     /* Сердечки */
@@ -305,7 +306,7 @@
       }
       
       .upload-box {
-        padding: 15px 10px;
+        padding: 12px 8px;
       }
       
       footer {
@@ -357,7 +358,7 @@
   <!-- Загрузка -->
   <div id="upload" class="tab">
     <div class="upload-box">
-      <h3>Выбери фото для загрузки 💖</h3>
+      <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Выбери фото для загрузки 💖</h3>
       <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
       <div class="upload-btn">Выбрать фото</div>
       <div id="uploadStatus"></div>
@@ -376,75 +377,69 @@
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // Уникальный идентификатор устройства
-    let deviceId = null;
+    // Переменная для счётчика
+    let currentCount = 0;
 
-    // === ИНИЦИАЛИЗАЦИЯ УСТРОЙСТВА ===
-    function initDeviceId() {
-      // Проверяем, есть ли уже ID в localStorage
-      deviceId = localStorage.getItem('device_id');
-      
-      if (!deviceId) {
-        // Создаем новый уникальный ID
-        deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0;
-          const v = c === 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-        
-        // Сохраняем в localStorage
-        localStorage.setItem('device_id', deviceId);
-      }
-      
-      console.log('Device ID:', deviceId);
-      loadCounter();
-    }
-
-    // === ЗАГРУЗКА СЧЁТЧИКА ИЗ SUPABASE ===
+    // === ЗАГРУЗКА СЧЁТЧИКА ===
     async function loadCounter() {
       try {
         const { data, error } = await supabaseClient
           .from('clicks')
           .select('count')
-          .eq('device_id', deviceId)
+          .eq('id', 1) // Используем одну фиксированную запись
           .single();
         
         if (error) {
-          if (error.code === 'PGRST116') { // Запись не найдена
-            await supabaseClient
-              .from('clicks')
-              .insert([{ device_id: deviceId, count: 0 }]);
-            updateCounterDisplay(0);
-          } else {
-            throw error;
+          console.error('Ошибка загрузки счётчика:', error);
+          
+          // Создаем запись, если её нет
+          const { error: insertError } = await supabaseClient
+            .from('clicks')
+            .insert([{ id: 1, count: 0 }]);
+          
+          if (insertError) {
+            console.error('Ошибка создания записи:', insertError);
+            // Fallback на localStorage
+            currentCount = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+            updateCounterDisplay(currentCount);
+            return;
           }
+          
+          currentCount = 0;
         } else {
-          updateCounterDisplay(data.count);
+          currentCount = data.count;
         }
+        
+        updateCounterDisplay(currentCount);
       } catch (err) {
-        console.error('Ошибка загрузки счётчика:', err);
+        console.error('Критическая ошибка счётчика:', err);
         // Fallback на localStorage
-        const count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
-        updateCounterDisplay(count);
+        currentCount = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+        updateCounterDisplay(currentCount);
       }
     }
 
     // === ОБНОВЛЕНИЕ СЧЁТЧИКА ===
     async function incrementCounter() {
       try {
-        const { data, error } = await supabaseClient
-          .rpc('increment_click', { device_id: deviceId });
+        // Увеличиваем локально
+        currentCount++;
+        updateCounterDisplay(currentCount);
+        
+        // Сохраняем в Supabase
+        const { error } = await supabaseClient
+          .from('clicks')
+          .update({ count: currentCount })
+          .eq('id', 1);
         
         if (error) throw error;
         
-        updateCounterDisplay(data);
+        // Сохраняем в localStorage как резерв
+        localStorage.setItem('zeffirkaClicks', currentCount);
       } catch (err) {
-        console.error('Ошибка обновления счётчика:', err);
-        // Fallback на localStorage
-        let count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
-        count++;
-        localStorage.setItem('zeffirkaClicks', count);
-        updateCounterDisplay(count);
+        console.error('Ошибка сохранения счётчика:', err);
+        // Сохраняем в localStorage
+        localStorage.setItem('zeffirkaClicks', currentCount);
       }
     }
 
@@ -690,8 +685,8 @@
       setBodyHeight();
       window.addEventListener('resize', setBodyHeight);
       
-      // Инициализируем ID устройства
-      initDeviceId();
+      // Загружаем счётчик
+      loadCounter();
       
       // Если на вкладке галереи при загрузке - загружаем фото
       if (document.getElementById('gallery').classList.contains('active')) {
