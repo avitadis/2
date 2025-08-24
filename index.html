@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Для моей Зефирки</title>
   <style>
     * {
@@ -275,7 +275,7 @@
   <!-- Подключаем Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // === НАСТРОЙКИ (убедись, что здесь НЕТ ПРОБЕЛОВ!) ===
+    // === НАСТРОЙКИ ===
     const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
     const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
@@ -284,39 +284,21 @@
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === ПРОВЕРКА localStorage ===
-    const storageAvailable = () => {
-      try {
-        const test = '__storage_test__';
-        localStorage.setItem(test, test);
-        localStorage.removeItem(test);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    };
-
     // === УПРАВЛЕНИЕ ВКЛАДКАМИ ===
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        // Скрываем все вкладки
         document.querySelectorAll('.tab').forEach(tab => {
           tab.classList.remove('active');
         });
         
-        // Убираем активный класс со всех кнопок
         document.querySelectorAll('.tab-btn').forEach(b => {
           b.classList.remove('active');
         });
         
-        // Показываем выбранную вкладку
         const tabId = btn.getAttribute('data-tab');
         document.getElementById(tabId).classList.add('active');
-        
-        // Делаем кнопку активной
         btn.classList.add('active');
         
-        // Если переключились на галерею, загружаем фото
         if (tabId === 'gallery') {
           loadGallery();
         }
@@ -327,18 +309,16 @@
     const counterEl = document.getElementById('counter');
     let count = 0;
 
-    // Загружаем из localStorage
-    if (storageAvailable()) {
+    if (typeof localStorage !== 'undefined') {
       count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
     }
     counterEl.textContent = count;
 
-    // Обработчик клика
     document.getElementById('mainBtn').addEventListener('click', () => {
       count++;
       counterEl.textContent = count;
       
-      if (storageAvailable()) {
+      if (typeof localStorage !== 'undefined') {
         localStorage.setItem('zeffirkaClicks', count);
       }
       
@@ -353,14 +333,10 @@
       if (isAnimating) return;
       isAnimating = true;
       
-      // Сброс анимации
       toast.classList.remove('show');
       void toast.offsetWidth;
-      
-      // Показываем
       toast.classList.add('show');
       
-      // Скрываем через 2.4 секунды
       setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => {
@@ -374,7 +350,6 @@
       const heart = document.createElement('div');
       heart.className = 'heart';
       
-      // Случайное положение
       const size = 16;
       const left = Math.random() * (window.innerWidth - size);
       const top = window.innerHeight;
@@ -382,10 +357,8 @@
       heart.style.left = `${left}px`;
       heart.style.top = `${top}px`;
       
-      // Добавляем в документ
       document.body.appendChild(heart);
       
-      // Анимация
       heart.animate([
         { transform: 'translateY(0) rotate(45deg)', opacity: 0.8 },
         { transform: `translateY(-${window.innerHeight + 100}px) rotate(45deg)`, opacity: 0 }
@@ -394,20 +367,17 @@
         easing: 'linear'
       });
       
-      // Удаляем после анимации
       setTimeout(() => {
         heart.remove();
       }, 4000);
     }
     
-    // Запускаем анимацию сердечек
     setInterval(createHeart, 500);
 
     // === ГАЛЕРЕЯ ===
     const galleryContainer = document.getElementById('galleryContainer');
 
     async function loadGallery() {
-      // Показываем индикатор загрузки
       galleryContainer.innerHTML = `
         <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
           Загрузка галереи...
@@ -418,11 +388,9 @@
         const { data, error } = await supabaseClient
           .from('photos')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('uploaded_at', { ascending: false }); // Используем uploaded_at вместо created_at
         
-        if (error) {
-          throw new Error(`Supabase error: ${error.message}`);
-        }
+        if (error) throw error;
         
         if (!data || data.length === 0) {
           galleryContainer.innerHTML = `
@@ -433,16 +401,17 @@
           return;
         }
         
-        // Очищаем контейнер
         galleryContainer.innerHTML = '';
         
-        // Добавляем фото
         data.forEach(photo => {
+          // ИСПРАВЛЕНИЕ 1: Удаляем пробелы из URL
+          const cleanUrl = photo.url.trim();
+          
           const photoEl = document.createElement('div');
           photoEl.className = 'photo';
           
           const img = document.createElement('img');
-          img.src = photo.url;
+          img.src = cleanUrl; // Используем очищенный URL
           img.alt = photo.name || 'Фото';
           img.loading = 'lazy';
           
@@ -452,8 +421,9 @@
       } catch (err) {
         console.error('Ошибка загрузки галереи:', err);
         galleryContainer.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ff4b5c;">
-            Ошибка загрузки галереи
+          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ff6b6b;">
+            Ошибка загрузки галереи<br>
+            <small>Проверьте консоль (F12)</small>
           </div>
         `;
       }
@@ -464,21 +434,17 @@
     const uploadStatus = document.getElementById('uploadStatus');
     const uploadBtn = document.querySelector('.upload-btn');
 
-    // При клике на кнопку загрузки
     uploadBtn.addEventListener('click', () => {
       fileInput.click();
     });
 
-    // Обработка выбора файлов
     fileInput.addEventListener('change', async () => {
       const files = Array.from(fileInput.files);
       if (files.length === 0) return;
       
-      // Очищаем статус
       uploadStatus.innerHTML = '';
       
       for (const file of files) {
-        // Создаем элемент статуса
         const statusItem = document.createElement('div');
         statusItem.className = 'status-item';
         statusItem.innerHTML = `
@@ -490,8 +456,7 @@
         const statusRight = statusItem.querySelector('.status-right');
         
         try {
-          // Загружаем на IMGBB
-          statusRight.textContent = 'Загрузка...';
+          statusRight.textContent = 'Загрузка на IMGBB...';
           
           const formData = new FormData();
           formData.append('image', file);
@@ -499,7 +464,6 @@
           const xhr = new XMLHttpRequest();
           xhr.open('POST', `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`);
           
-          // Отслеживаем прогресс
           xhr.upload.onprogress = (e) => {
             if (e.lengthComputable) {
               const percent = Math.round((e.loaded / e.total) * 100);
@@ -507,20 +471,22 @@
             }
           };
           
-          // Обрабатываем результат
           xhr.onload = async () => {
             if (xhr.status === 200) {
               try {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success && response.data && response.data.url) {
-                  const imageUrl = response.data.url;
+                  // ИСПРАВЛЕНИЕ 2: Удаляем пробелы из полученного URL
+                  const cleanImageUrl = response.data.url.trim();
                   
-                  statusRight.textContent = 'Сохранение...';
+                  statusRight.textContent = 'Сохранение в Supabase...';
                   
-                  // Сохраняем в Supabase
                   const { error } = await supabaseClient
                     .from('photos')
-                    .insert([{ name: file.name, url: imageUrl }]);
+                    .insert([{ 
+                      name: file.name, 
+                      url: cleanImageUrl // Сохраняем очищенный URL
+                    }]);
                   
                   if (error) throw error;
                   
@@ -529,26 +495,25 @@
                     statusItem.style.opacity = '0.5';
                   }, 1500);
                 } else {
-                  throw new Error('Invalid IMGBB response');
+                  throw new Error(response.error?.message || 'Invalid IMGBB response');
                 }
               } catch (err) {
                 console.error('Supabase error:', err);
-                statusRight.textContent = 'Ошибка';
+                statusRight.textContent = 'Ошибка Supabase';
                 statusRight.style.color = '#e74c3c';
               }
             } else {
-              throw new Error(`HTTP ${xhr.status}`);
+              const response = JSON.parse(xhr.responseText);
+              throw new Error(response.error?.message || `HTTP ${xhr.status}`);
             }
           };
           
-          // Обработка ошибок
           xhr.onerror = () => {
             console.error('Network error');
             statusRight.textContent = 'Ошибка сети';
             statusRight.style.color = '#e74c3c';
           };
           
-          // Отправляем запрос
           xhr.send(formData);
         } catch (err) {
           console.error('Upload error:', err);
@@ -557,16 +522,7 @@
         }
       }
       
-      // Сбрасываем выбор файлов
       fileInput.value = '';
-    });
-
-    // === ИНИЦИАЛИЗАЦИЯ ===
-    document.addEventListener('DOMContentLoaded', () => {
-      // Если на вкладке галереи при загрузке - загружаем фото
-      if (document.getElementById('gallery').classList.contains('active')) {
-        loadGallery();
-      }
     });
   </script>
 </body>
