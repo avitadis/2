@@ -32,13 +32,13 @@
       display: flex;
       justify-content: center;
       gap: 10px;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.15);
       z-index: 1000;
       backdrop-filter: blur(4px);
     }
 
     .tab-btn {
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       background: rgba(255, 255, 255, 0.1);
@@ -47,6 +47,7 @@
       cursor: pointer;
       transition: all 0.2s;
       font-size: 0.95rem;
+      margin-top: 8px;
     }
 
     .tab-btn.active {
@@ -78,7 +79,7 @@
       font-size: 1.1rem;
       max-width: 380px;
       margin: 0 auto 25px;
-      white-space: pre-line;
+      white-space: pre-line; /* Важно для переносов */
       line-height: 1.4;
       background: rgba(0, 0, 0, 0.15);
       padding: 15px;
@@ -97,10 +98,16 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
+    .click-counter-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 12px 0 0;
+    }
+    
     .click-counter {
       font-size: 1.05rem;
       color: white;
-      margin: 12px 0 0;
       text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     }
 
@@ -111,6 +118,7 @@
       width: 100%;
       text-align: center;
       color: rgba(255, 255, 255, 0.9);
+      padding: 0 15px;
     }
 
     /* Всплывающее окно */
@@ -201,21 +209,21 @@
 
     /* Загрузка */
     .upload-box {
-      background: rgba(0, 0, 0, 0.2); /* Прозрачный фон */
+      background: rgba(0, 0, 0, 0.2);
       backdrop-filter: blur(4px);
       color: white;
       border-radius: 12px;
-      padding: 12px 10px; /* Очень маленькие отступы */
-      max-width: 320px; /* Очень узкая подложка */
+      padding: 12px 10px;
+      max-width: 320px;
       margin: 0 auto;
       text-align: center;
-      flex: 0 0 auto; /* Не растягивается */
+      flex: 0 0 auto;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .upload-btn {
       display: inline-block;
-      padding: 6px 12px; /* Очень маленькая кнопка */
+      padding: 6px 12px;
       background: rgba(255, 75, 92, 0.85);
       color: white;
       border-radius: 6px;
@@ -241,7 +249,7 @@
     .status-item {
       background: rgba(255, 255, 255, 0.1);
       color: white;
-      padding: 4px 8px; /* Очень маленькие статусы */
+      padding: 4px 8px;
       border-radius: 4px;
       margin: 4px 0;
       border-left: 2px solid #ff4b5c;
@@ -305,8 +313,9 @@
       }
       
       .tab-btn {
-        padding: 6px 12px;
+        padding: 8px 12px;
         font-size: 0.85rem;
+        margin-top: 6px;
       }
     }
 
@@ -368,9 +377,11 @@
     </div>
     
     <button class="main-btn" id="mainBtn">Нажми меня</button>
-    <div class="click-counter">Кликов: <span id="counter">0</span></div>
+    <div class="click-counter-container">
+      <div class="click-counter">Кликов: <span id="counter">0</span></div>
+    </div>
     
-    <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+    <footer>Если вдруг ты стала забывать, как я тебя люблю,<br>он будет здесь всегда 🌹</footer>
   </div>
 
   <!-- Галерея -->
