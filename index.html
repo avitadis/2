@@ -35,7 +35,7 @@
       background: rgba(0, 0, 0, 0.15);
       z-index: 1000;
       backdrop-filter: blur(4px);
-      padding-bottom: 6px; /* Добавил отступ снизу */
+      padding-bottom: 6px;
     }
 
     .tab-btn {
@@ -49,7 +49,7 @@
       transition: all 0.2s;
       font-size: 0.95rem;
       margin-top: 8px;
-      margin-bottom: 4px; /* Кнопки не прилипают к низу */
+      margin-bottom: 4px;
     }
 
     .tab-btn.active {
@@ -72,10 +72,10 @@
 
     /* Главная страница */
     h1 {
-      font-size: 2.5rem; /* Увеличил шрифт */
+      font-size: 2.5rem;
       margin: 10px 0 15px;
       line-height: 1.2;
-      text-align: center; /* Точно по центру */
+      text-align: center;
       width: 100%;
     }
 
@@ -115,15 +115,21 @@
       text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     }
 
-    footer {
+    /* Исправленный футер - СПОСОБ 1: Абсолютное центрирование */
+    .footer-container {
       position: absolute;
       bottom: 20px;
-      font-size: 0.95rem;
-      width: 100%;
+      left: 0;
+      right: 0;
       text-align: center;
-      color: rgba(255, 255, 255, 0.9);
       padding: 0 15px;
-      text-align: center; /* Точно по центру */
+      z-index: 100;
+    }
+
+    .footer-text {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.4;
     }
 
     /* Всплывающее окно */
@@ -323,6 +329,10 @@
         margin-top: 6px;
         margin-bottom: 3px;
       }
+      
+      .footer-text {
+        font-size: 0.85rem;
+      }
     }
 
     @media (max-width: 480px) {
@@ -349,9 +359,8 @@
         padding: 10px 8px;
       }
       
-      footer {
-        font-size: 0.85rem;
-        padding: 0 10px;
+      .footer-text {
+        font-size: 0.8rem; /* Уменьшил шрифт на мобильных */
       }
     }
   </style>
@@ -387,7 +396,10 @@
       <div class="click-counter">Кликов: <span id="counter">0</span></div>
     </div>
     
-    <footer>Если вдруг ты стала забывать, как я тебя люблю,<br>он будет здесь всегда 🌹</footer>
+    <!-- Исправленный футер -->
+    <div class="footer-container">
+      <div class="footer-text">Если вдруг ты стала забывать, как я тебя люблю,<br>он будет здесь всегда 🌹</div>
+    </div>
   </div>
 
   <!-- Галерея -->
