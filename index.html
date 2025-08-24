@@ -1,156 +1,161 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Для моей Зефирки</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: url("background.jpg") no-repeat center center/cover;
-      font-family: "Segoe UI", sans-serif;
-      text-align: center;
-      overflow: hidden;
-      color: white;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-    }
-    nav {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-    }
-    nav button {
-      margin-left: 10px;
-      padding: 10px 18px;
-      border: none;
-      border-radius: 20px;
-      background: white;
-      color: #ff4b5c;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-    nav button:hover { transform: scale(1.1); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для моей Зефирки</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: url("background.jpg") no-repeat center center/cover;
+    color: white;
+    text-align: center;
+    overflow-x: hidden;
+  }
 
-    h1 { font-size: 2.5rem; margin: 0 0 15px; }
-    p { font-size: 1.2rem; max-width: 300px; margin-bottom: 20px; white-space: pre-line; }
-    button.main-btn {
-      padding: 12px 24px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 25px;
-      background: white;
-      color: #ff4b5c;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-    button.main-btn:hover { transform: scale(1.1); }
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    background: #ff4b5c;
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  nav button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    background: white;
+    color: #ff4b5c;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  nav button:hover { background: #ffe5e9; }
+  nav button.active { background: #fff0f2; border: 2px solid #ff4b5c; }
 
-    .click-counter {
-      font-size: 1rem;
-      margin: 8px 0 0;
-      text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
-    }
-    footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: 1rem;
-      max-width: 320px;
-    }
+  .tab {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    min-height: 80vh;
+  }
+  .tab.active { display: flex; }
 
-    /* Сердечки */
-    .heart {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: red;
-      transform: rotate(45deg);
-      animation: floatUp 4s linear infinite;
-      opacity: 0.7;
-    }
-    .heart::before, .heart::after {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: red;
-      border-radius: 50%;
-    }
-    .heart::before { top: -10px; left: 0; }
-    .heart::after { left: -10px; top: 0; }
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(45deg); opacity: 1; }
-      100% { transform: translateY(-600px) rotate(45deg); opacity: 0; }
-    }
+  /* Главная */
+  h1 { font-size: 2.5rem; margin: 0 0 15px; text-shadow: 2px 2px 10px rgba(0,0,0,0.6); }
+  p { font-size: 1.2rem; max-width: 350px; margin-bottom: 20px; white-space: pre-line; text-shadow: 1px 1px 5px rgba(0,0,0,0.6); }
+  .main-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 25px;
+    background: white;
+    color: #ff4b5c;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .main-btn:hover { transform: scale(1.1); }
+  .click-counter { font-size: 1rem; margin: 10px 0; text-shadow: 1px 1px 5px rgba(0,0,0,0.6); }
 
-    /* Toast */
-    .toast {
-      position: absolute;
-      left: 50%;
-      bottom: -60px;
-      transform: translateX(-50%) scale(0.9);
-      background: rgba(0, 0, 0, 0.85);
-      color: white;
-      padding: 16px 30px;
-      border-radius: 30px;
-      font-size: 1.3rem;
-      font-weight: bold;
-      box-shadow: 0 6px 20px rgba(255, 100, 150, 0.5);
-      z-index: 1000;
-      opacity: 0;
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      white-space: nowrap;
-      backdrop-filter: blur(5px);
-      pointer-events: none;
-    }
-    .toast.show {
-      bottom: 40px;
-      transform: translateX(-50%) scale(1);
-      opacity: 1;
-    }
+  footer { margin-top: 20px; font-size: 1rem; max-width: 350px; }
 
-    /* Галерея */
-    #gallery {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 60px;
-    }
-    #gallery h2 { margin-bottom: 20px; }
-    #images {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
-    #images img {
-      width: 150px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-  </style>
+  /* Сердечки */
+  .heart {
+    position: absolute;
+    width: 20px; height: 20px;
+    background: red; transform: rotate(45deg);
+    animation: floatUp 4s linear infinite;
+    opacity: 0.7;
+  }
+  .heart::before, .heart::after { content:""; position:absolute; width:20px; height:20px; background:red; border-radius:50%; }
+  .heart::before { top:-10px; left:0; } .heart::after { left:-10px; top:0; }
+  @keyframes floatUp { 0% { transform: translateY(0) rotate(45deg); opacity:1; } 100% { transform: translateY(-600px) rotate(45deg); opacity:0; } }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    left: 50%;
+    bottom: -60px;
+    transform: translateX(-50%) scale(0.9);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 16px 30px;
+    border-radius: 30px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(255,100,150,0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.25,0.8,0.25,1);
+    white-space: nowrap;
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+  }
+  .toast.show { bottom: 40px; transform: translateX(-50%) scale(1); opacity: 1; }
+
+  /* Галерея */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    width: 90%;
+  }
+  .gallery img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.3s;
+  }
+  .gallery img:hover { transform: scale(1.05); }
+
+  /* Загрузка */
+  .upload-box {
+    margin: 20px auto;
+    padding: 20px;
+    border: 2px dashed #ff4b5c;
+    border-radius: 20px;
+    max-width: 400px;
+    background: #fff5f6;
+    color: #333;
+  }
+  input[type="file"] { display: none; }
+  label.upload-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #ff4b5c;
+    color: white;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+  }
+  label.upload-btn:hover { background: #e53b4c; }
+  #uploadStatus p { margin: 5px 0; color: #333; font-weight: bold; }
+</style>
 </head>
 <body>
 
-  <nav>
-    <button onclick="showSection('home')">Главная</button>
-    <button onclick="showSection('gallery')">Галерея</button>
-  </nav>
+<nav>
+  <button class="tab-btn active" data-tab="home">Главная</button>
+  <button class="tab-btn" data-tab="gallery">Галерея</button>
+  <button class="tab-btn" data-tab="upload">Загрузка фото</button>
+</nav>
 
-  <!-- Всплывашка -->
-  <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
+<!-- Toast -->
+<div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
-  <!-- Главная -->
-  <div id="home">
-    <h1>Зефирка моя,<br> я тебя люблю ❤️</h1>
-    <p>Я о тебе, кто мне всего дороже,
+<!-- Главная -->
+<div id="home" class="tab active">
+  <h1>Зефирка моя,<br> я тебя люблю ❤️</h1>
+  <p>Я о тебе, кто мне всего дороже,
 боюсь писать.
 Вдруг кто-нибудь, любя,
 заговорит с другой,
@@ -158,109 +163,120 @@
 словами, что нашёл
 я для тебя.
 Спасибо тебе, что ты есть в моей жизни 💕</p>
-    <button class="main-btn" onclick="handleClick()">Нажми меня</button>
-    <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
-    <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+  <button class="main-btn" onclick="handleClick()">Нажми меня</button>
+  <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
+  <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
+</div>
+
+<!-- Галерея -->
+<div id="gallery" class="tab">
+  <div id="photos" class="gallery"></div>
+</div>
+
+<!-- Загрузка -->
+<div id="upload" class="tab">
+  <div class="upload-box">
+    <h3>Выбери фото для загрузки 💖</h3>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+    <label for="fileInput" class="upload-btn">Выбрать фото</label>
+    <div id="uploadStatus"></div>
   </div>
+</div>
 
-  <!-- Галерея -->
-  <div id="gallery">
-    <h2>Фотогалерея 📸</h2>
-    <input type="file" id="fileInput">
-    <button onclick="uploadImage()">Загрузить</button>
-    <div id="images"></div>
-  </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js";
 
-  <!-- Firebase + скрипты -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDF9V1fKurbqRPgv31mabmazhbKXtKfibE",
+  authDomain: "loveyou-eaa77.firebaseapp.com",
+  projectId: "loveyou-eaa77",
+  storageBucket: "loveyou-eaa77.appspot.com",
+  messagingSenderId: "497705197325",
+  appId: "1:497705197325:web:3341f296e4d0e3cc2f9a44"
+};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDF9V1fKurbqRPgv31mabmazhbKXtKfibE",
-      authDomain: "loveyou-eaa77.firebaseapp.com",
-      projectId: "loveyou-eaa77",
-      storageBucket: "loveyou-eaa77.appspot.com",
-      messagingSenderId: "497705197325",
-      appId: "1:497705197325:web:3341f296e4d0e3cc2f9a44"
-    };
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-    const auth = getAuth();
-    signInAnonymously(auth).catch(console.error);
+const photosDiv = document.getElementById("photos");
+const fileInput = document.getElementById("fileInput");
+const statusDiv = document.getElementById("uploadStatus");
 
-    async function uploadImage() {
-      const file = document.getElementById("fileInput").files[0];
-      if (!file) return alert("Выбери файл!");
-      const storageRef = ref(storage, 'images/' + Date.now() + "-" + file.name);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      addImageToGallery(url);
-    }
+// Загружаем галерею
+async function loadGallery() {
+  photosDiv.innerHTML = "";
+  const listRef = ref(storage, "photos");
+  const res = await listAll(listRef);
+  for (const item of res.items) {
+    const url = await getDownloadURL(item);
+    const img = document.createElement("img");
+    img.src = url;
+    photosDiv.appendChild(img);
+  }
+}
+loadGallery();
 
-    function addImageToGallery(url) {
-      const img = document.createElement("img");
-      img.src = url;
-      document.getElementById("images").appendChild(img);
-    }
+// Мультизагрузка с прогрессом
+fileInput.addEventListener("change", async (e) => {
+  const files = e.target.files;
+  if (!files.length) return;
+  statusDiv.innerHTML = "";
+  for (const file of files) {
+    const fileRef = ref(storage, "photos/" + Date.now() + "_" + file.name);
+    const uploadTask = uploadBytesResumable(fileRef, file);
 
-    async function loadGallery() {
-      const listRef = ref(storage, 'images/');
-      const res = await listAll(listRef);
-      for (let item of res.items) {
-        const url = await getDownloadURL(item);
-        addImageToGallery(url);
+    const statusItem = document.createElement("p");
+    statusItem.textContent = `${file.name}: 0%`;
+    statusDiv.appendChild(statusItem);
+
+    uploadTask.on("state_changed",
+      snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes * 100).toFixed(0);
+        statusItem.textContent = `${file.name}: ${progress}%`;
+      },
+      error => {
+        statusItem.textContent = `${file.name}: Ошибка`;
+        console.error(error);
+      },
+      async () => {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        statusItem.textContent = `${file.name}: Загружено!`;
+        const img = document.createElement("img");
+        img.src = url;
+        photosDiv.appendChild(img);
       }
-    }
-    loadGallery();
-  </script>
+    );
+  }
+  fileInput.value = "";
+});
+</script>
 
-  <script>
-    // Переключение вкладок
-    function showSection(section) {
-      document.getElementById("home").style.display = section === "home" ? "block" : "none";
-      document.getElementById("gallery").style.display = section === "gallery" ? "flex" : "none";
-    }
+<script>
+  // Вкладки
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabs = document.querySelectorAll(".tab");
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      tabBtns.forEach(b => b.classList.remove("active"));
+      tabs.forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
 
-    // LocalStorage + клики
-    const counterElement = document.getElementById("clickCounter");
-    let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
-    counterElement.textContent = count;
-    function saveCount(num) { localStorage.setItem("zeffirkaClicks", num); }
+  // Главная кнопка и сердечки
+  const counterElement = document.getElementById("clickCounter");
+  let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
+  counterElement.textContent = count;
 
-    const toast = document.getElementById("loveToast");
-    let isAnimating = false;
-    function showToast() {
-      if (isAnimating) return;
-      isAnimating = true;
+  const toast = document.getElementById("loveToast");
+  let isAnimating = false;
+  function showToast() {
+    if (isAnimating) return;
+    isAnimating = true;
+    toast.classList.remove("show");
+    void toast.offsetWidth;
+    toast.classList.add("show");
+    setTimeout(() => {
       toast.classList.remove("show");
-      void toast.offsetWidth;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => isAnimating = false, 400);
-      }, 2500);
-    }
-
-    function handleClick() {
-      count++;
-      counterElement.textContent = count;
-      saveCount(count);
-      showToast();
-    }
-
-    // Сердечки
-    function createHeart() {
-      const heart = document.createElement("div");
-      heart.className = "heart";
-      heart.style.left = Math.random() * window.innerWidth + "px";
-      heart.style.top = window.innerHeight + "px";
-      document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 4000);
-    }
-    setInterval(createHeart, 500);
-  </script>
-</body>
-</html>
