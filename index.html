@@ -83,7 +83,22 @@ footer{ margin-top:14px; font-size:0.95rem; color:#fff; opacity:0.95; }
 @keyframes floatUp{0%{transform:translateY(0) rotate(45deg);opacity:1}100%{transform:translateY(-620px) rotate(45deg);opacity:0}}
 
 /* Toast */
-.toast{ position: fixed; left:50%; bottom:-90px; transform:translateX(-50%) scale(.95); background:rgba(0,0,0,0.85); color:white; padding:12px 22px; border-radius:26px; font-weight:700; z-index:1200; opacity:0; transition: all .35s cubic-bezier(.2,.9,.2,1); white-space:nowrap; }
+.toast{ 
+  position: fixed; 
+  left:50%; 
+  bottom:-90px; 
+  transform:translateX(-50%) scale(.95); 
+  background:rgba(0,0,0,0.85); 
+  color:white; 
+  padding:12px 22px; 
+  border-radius:26px; 
+  font-weight:700; 
+  z-index:1200; 
+  opacity:0; 
+  transition: all .35s cubic-bezier(.2,.9,.2,1); 
+  white-space:nowrap;
+  pointer-events: none; /* Ключевое исправление */
+}
 .toast.show{ bottom:36px; opacity:1; transform:translateX(-50%) scale(1); }
 
 /* Upload box */
@@ -97,7 +112,14 @@ label.upload-btn:hover{ background: var(--accent-dark); }
 .status-right{ min-width:70px; text-align:right; color:#555; font-weight:700; }
 
 /* Gallery */
-#gallery{ width:92%; max-width: var(--max-content-width); margin:18px auto 80px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:14px; }
+#gallery-container { 
+  width:92%; 
+  max-width: var(--max-content-width); 
+  margin:18px auto 80px; 
+  display:grid; 
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+  gap:14px; 
+}
 .photo{ position:relative; border-radius:12px; overflow:hidden; background: rgba(0,0,0,0.06); box-shadow:0 10px 30px rgba(0,0,0,0.35); }
 .photo img{ width:100%; height:100%; display:block; object-fit:cover; }
 .caption{ position:absolute; left:8px; right:8px; bottom:8px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.55)); color:white; padding:8px 10px; border-radius:8px; display:flex; justify-content:space-between; gap:8px; align-items:center; }
@@ -137,7 +159,9 @@ label.upload-btn:hover{ background: var(--accent-dark); }
 </div>
 
 <!-- GALLERY -->
-<div id="gallery" class="tab" aria-live="polite"></div>
+<div id="gallery" class="tab">
+  <div id="gallery-container"></div>
+</div>
 
 <!-- UPLOAD -->
 <div id="upload" class="tab">
@@ -149,254 +173,251 @@ label.upload-btn:hover{ background: var(--accent-dark); }
   </div>
 </div>
 
-<script type="module">
-/* -----------------------
-   Supabase + IMGBB final, checked
-   ----------------------- */
+<!-- Подключаем Supabase без модулей -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // === Твои креды (без пробелов!) ===
+  const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
+  const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// === Твои креды (как ты дал) ===
-const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
-const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-/* Tabs */
-const tabBtns = document.querySelectorAll(".tab-btn");
-const tabs = document.querySelectorAll(".tab");
-tabBtns.forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    tabBtns.forEach(b=>b.classList.remove("active"));
-    tabs.forEach(t=>t.classList.remove("active"));
-    btn.classList.add("active");
-    const targetId = btn.dataset.tab;
-    const target = document.getElementById(targetId);
-    if(target) target.classList.add("active");
-    window.scrollTo({top:0, behavior:"smooth"});
+  /* Tabs */
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabs = document.querySelectorAll(".tab");
+  tabBtns.forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      tabBtns.forEach(b=>b.classList.remove("active"));
+      tabs.forEach(t=>t.classList.remove("active"));
+      btn.classList.add("active");
+      const targetId = btn.dataset.tab;
+      const target = document.getElementById(targetId);
+      if(target) target.classList.add("active");
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
   });
-});
 
-/* Click counter (persist in localStorage) */
-const counterElement = document.getElementById("clickCounter");
-let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
-counterElement.textContent = count;
-
-const toast = document.getElementById("loveToast");
-let toastAnimating=false;
-function showToast(){
-  if(toastAnimating) return;
-  toastAnimating=true;
-  toast.classList.remove("show");
-  void toast.offsetWidth;
-  toast.classList.add("show");
-  setTimeout(()=>{ toast.classList.remove("show"); setTimeout(()=>{ toastAnimating=false },380); }, 2400);
-}
-document.getElementById("mainBtn").addEventListener("click", ()=> {
-  count++;
+  /* Click counter (persist in localStorage) */
+  const counterElement = document.getElementById("clickCounter");
+  let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
   counterElement.textContent = count;
-  localStorage.setItem("zeffirkaClicks", count);
-  showToast();
-});
 
-/* Hearts */
-function createHeart(){
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.style.left = (Math.random()*(window.innerWidth-40)) + "px";
-  heart.style.top = (window.innerHeight + 20) + "px";
-  document.body.appendChild(heart);
-  setTimeout(()=> heart.remove(), 4200);
-}
-setInterval(createHeart, 520);
-
-/* Gallery: load from Supabase only */
-const gallery = document.getElementById("gallery");
-
-async function loadGallery(){
-  gallery.innerHTML = "";
-  try {
-    const { data, error } = await supabase
-      .from("photos")
-      .select("id,name,url,created_at")
-      .order("created_at", { ascending: true }); // старые — в начале
-    if (error) throw error;
-    if (!Array.isArray(data) || data.length === 0) {
-      const hint = document.createElement("div");
-      hint.style.color = "rgba(255,255,255,0.95)";
-      hint.style.margin = "12px";
-      hint.textContent = "Пока нет загруженных фото.";
-      gallery.appendChild(hint);
-      return;
-    }
-    for (const item of data) {
-      appendPhotoToGallery(item);
-    }
-  } catch (err) {
-    console.error("Ошибка при загрузке галереи из Supabase:", err);
-    const errMsg = document.createElement("div");
-    errMsg.style.color = "rgba(255,255,255,0.95)";
-    errMsg.style.margin = "12px";
-    errMsg.textContent = "Не удалось загрузить галерею (смотрите консоль).";
-    gallery.appendChild(errMsg);
+  const toast = document.getElementById("loveToast");
+  let toastAnimating = false;
+  function showToast() {
+    if (toastAnimating) return;
+    toastAnimating = true;
+    toast.classList.remove("show");
+    void toast.offsetWidth;
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toastAnimating = false;
+      }, 380);
+    }, 2400);
   }
-}
-
-function appendPhotoToGallery(photo){
-  // photo: {id, name, url, created_at}
-  const wrapper = document.createElement("div");
-  wrapper.className = "photo";
-
-  const img = document.createElement("img");
-  img.src = photo.url;
-  img.alt = photo.name || "Фото";
-  img.loading = "lazy";
-  wrapper.appendChild(img);
-
-  const caption = document.createElement("div");
-  caption.className = "caption";
-
-  const left = document.createElement("div");
-  left.textContent = photo.name || "";
-
-  const right = document.createElement("div");
-  right.style.display = "flex";
-  right.style.gap = "8px";
-  right.style.alignItems = "center";
-
-  const dateSpan = document.createElement("div");
-  dateSpan.style.fontSize = "0.82rem";
-  dateSpan.style.opacity = "0.95";
-  if (photo.created_at) {
-    try { dateSpan.textContent = new Date(photo.created_at).toLocaleString(); } catch(e){ dateSpan.textContent = ""; }
-  }
-
-  const delBtn = document.createElement("button");
-  delBtn.className = "remove-btn";
-  delBtn.textContent = "Удалить";
-  delBtn.addEventListener("click", async (ev) => {
-    ev.stopPropagation();
-    if (!confirm("Удалить эту запись из галереи? (удаление из imgbb не выполняется автоматически)")) return;
-    try {
-      const { error } = await supabase.from("photos").delete().eq("id", photo.id);
-      if (error) throw error;
-      wrapper.remove();
-    } catch (err) {
-      console.error("Ошибка удаления из Supabase:", err);
-      alert("Ошибка при удалении (проверьте консоль).");
-    }
+  document.getElementById("mainBtn").addEventListener("click", () => {
+    count++;
+    counterElement.textContent = count;
+    localStorage.setItem("zeffirkaClicks", count);
+    showToast();
   });
 
-  right.appendChild(dateSpan);
-  right.appendChild(delBtn);
+  /* Hearts */
+  function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = (Math.random() * (window.innerWidth - 40)) + "px";
+    heart.style.top = (window.innerHeight + 20) + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4200);
+  }
+  setInterval(createHeart, 520);
 
-  caption.appendChild(left);
-  caption.appendChild(right);
-  wrapper.appendChild(caption);
+  /* Gallery: load from Supabase only */
+  const galleryContainer = document.getElementById("gallery-container");
 
-  gallery.appendChild(wrapper);
-}
-
-/* Upload handling: only IMGBB + Supabase.
-   - No localStorage fallbacks for photos.
-   - No image preview in upload area (only filename + percent).
-   - Add to gallery only after Supabase insert succeeds.
-*/
-const fileInput = document.getElementById("fileInput");
-const statusDiv = document.getElementById("uploadStatus");
-
-fileInput.addEventListener("change", async () => {
-  const files = Array.from(fileInput.files || []);
-  if (!files.length) return;
-  // clear statuses (but keep gallery as-is)
-  statusDiv.innerHTML = "";
-
-  for (const file of files) {
-    // status row
-    const statusItem = document.createElement("div");
-    statusItem.className = "status-item";
-    const left = document.createElement("div"); left.className = "status-left"; left.textContent = file.name;
-    const right = document.createElement("div"); right.className = "status-right"; right.textContent = "0%";
-    statusItem.appendChild(left); statusItem.appendChild(right);
-    statusDiv.appendChild(statusItem);
-
-    // upload via XHR to imgbb for progress
+  async function loadGallery() {
+    galleryContainer.innerHTML = "";
     try {
-      const urlFromImgbb = await uploadToImgbb(file, pct => {
-        right.textContent = pct + "%";
-      });
-
-      right.textContent = "Сохранение...";
-
-      // insert into supabase and only then show in gallery
-      const record = { name: file.name, url: urlFromImgbb };
       const { data, error } = await supabase
         .from("photos")
-        .insert([record])
-        .select()
-        .single(); // return inserted row
-      if (error) {
-        console.error("Ошибка вставки в Supabase:", error);
-        right.textContent = "Ошибка записи";
-        // do NOT append to gallery
-        continue;
+        .select("id,name,url,created_at")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      if (!Array.isArray(data) || data.length === 0) {
+        const hint = document.createElement("div");
+        hint.style.color = "rgba(255,255,255,0.95)";
+        hint.style.margin = "12px";
+        hint.textContent = "Пока нет загруженных фото.";
+        galleryContainer.appendChild(hint);
+        return;
       }
-      // success: append to gallery
-      right.textContent = "Готово";
-      appendPhotoToGallery(data);
+      for (const item of data) {
+        appendPhotoToGallery(item);
+      }
     } catch (err) {
-      console.error("Upload workflow error:", err);
-      // update status to error
-      statusItem.querySelector(".status-right").textContent = "Ошибка";
+      console.error("Ошибка при загрузке галереи из Supabase:", err);
+      const errMsg = document.createElement("div");
+      errMsg.style.color = "rgba(255,255,255,0.95)";
+      errMsg.style.margin = "12px";
+      errMsg.textContent = "Не удалось загрузить галерею (смотрите консоль).";
+      galleryContainer.appendChild(errMsg);
     }
   }
 
-  // clear file input to allow same file again
-  fileInput.value = "";
-});
+  function appendPhotoToGallery(photo) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "photo";
 
-/* helper: upload a File to imgbb via XHR, returns image url string */
-function uploadToImgbb(file, onProgress){
-  return new Promise((resolve, reject) => {
-    const form = new FormData();
-    form.append("image", file);
+    const img = document.createElement("img");
+    img.src = photo.url;
+    img.alt = photo.name || "Фото";
+    img.loading = "lazy";
+    wrapper.appendChild(img);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `https://api.imgbb.com/1/upload?key=${encodeURIComponent(IMGBB_API_KEY)}`);
+    const caption = document.createElement("div");
+    caption.className = "caption";
 
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const pct = Math.round((e.loaded / e.total) * 100);
-        try { if (onProgress) onProgress(pct); } catch(_) {}
+    const left = document.createElement("div");
+    left.textContent = photo.name || "";
+
+    const right = document.createElement("div");
+    right.style.display = "flex";
+    right.style.gap = "8px";
+    right.style.alignItems = "center";
+
+    const dateSpan = document.createElement("div");
+    dateSpan.style.fontSize = "0.82rem";
+    dateSpan.style.opacity = "0.95";
+    if (photo.created_at) {
+      try {
+        dateSpan.textContent = new Date(photo.created_at).toLocaleString();
+      } catch (e) {
+        dateSpan.textContent = "";
       }
-    };
+    }
 
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const resp = JSON.parse(xhr.responseText);
-          if (resp && resp.success && resp.data && resp.data.url) {
-            resolve(resp.data.url);
-          } else {
-            reject(new Error("Bad response from imgbb"));
-          }
-        } catch (err) {
-          reject(err);
+    const delBtn = document.createElement("button");
+    delBtn.className = "remove-btn";
+    delBtn.textContent = "Удалить";
+    delBtn.addEventListener("click", async (ev) => {
+      ev.stopPropagation();
+      if (!confirm("Удалить эту запись из галереи? (удаление из imgbb не выполняется автоматически)")) return;
+      try {
+        const { error } = await supabase.from("photos").delete().eq("id", photo.id);
+        if (error) throw error;
+        wrapper.remove();
+      } catch (err) {
+        console.error("Ошибка удаления из Supabase:", err);
+        alert("Ошибка при удалении (проверьте консоль).");
+      }
+    });
+
+    right.appendChild(dateSpan);
+    right.appendChild(delBtn);
+
+    caption.appendChild(left);
+    caption.appendChild(right);
+    wrapper.appendChild(caption);
+
+    galleryContainer.appendChild(wrapper);
+  }
+
+  /* Upload handling */
+  const fileInput = document.getElementById("fileInput");
+  const statusDiv = document.getElementById("uploadStatus");
+
+  fileInput.addEventListener("change", async () => {
+    const files = Array.from(fileInput.files || []);
+    if (!files.length) return;
+    statusDiv.innerHTML = "";
+
+    for (const file of files) {
+      const statusItem = document.createElement("div");
+      statusItem.className = "status-item";
+      const left = document.createElement("div");
+      left.className = "status-left";
+      left.textContent = file.name;
+      const right = document.createElement("div");
+      right.className = "status-right";
+      right.textContent = "0%";
+      statusItem.appendChild(left);
+      statusItem.appendChild(right);
+      statusDiv.appendChild(statusItem);
+
+      try {
+        const urlFromImgbb = await uploadToImgbb(file, pct => {
+          right.textContent = pct + "%";
+        });
+
+        right.textContent = "Сохранение...";
+
+        const record = { name: file.name, url: urlFromImgbb };
+        const { data, error } = await supabase
+          .from("photos")
+          .insert([record])
+          .select()
+          .single();
+        if (error) {
+          console.error("Ошибка вставки в Supabase:", error);
+          right.textContent = "Ошибка записи";
+          continue;
         }
-      } else {
-        reject(new Error("HTTP " + xhr.status));
+        right.textContent = "Готово";
+        appendPhotoToGallery(data);
+      } catch (err) {
+        console.error("Upload workflow error:", err);
+        statusItem.querySelector(".status-right").textContent = "Ошибка";
       }
-    };
+    }
 
-    xhr.onerror = () => reject(new Error("Network error uploading to imgbb"));
-    xhr.send(form);
+    fileInput.value = "";
   });
-}
 
-/* initial load */
-loadGallery();
+  function uploadToImgbb(file, onProgress) {
+    return new Promise((resolve, reject) => {
+      const form = new FormData();
+      form.append("image", file);
 
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `https://api.imgbb.com/1/upload?key=${encodeURIComponent(IMGBB_API_KEY)}`);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          try {
+            if (onProgress) onProgress(pct);
+          } catch (_) {}
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const resp = JSON.parse(xhr.responseText);
+            if (resp && resp.success && resp.data && resp.data.url) {
+              resolve(resp.data.url);
+            } else {
+              reject(new Error("Bad response from imgbb"));
+            }
+          } catch (err) {
+            reject(err);
+          }
+        } else {
+          reject(new Error("HTTP " + xhr.status));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error("Network error uploading to imgbb"));
+      xhr.send(form);
+    });
+  }
+
+  /* initial load */
+  loadGallery();
 </script>
 </body>
 </html>
