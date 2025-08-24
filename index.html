@@ -177,10 +177,11 @@
 
     /* Загрузка */
     .upload-box {
-      background: rgba(255, 255, 255, 0.95);
-      color: #222;
+      background: rgba(255, 255, 255, 0.15); /* Уменьшил непрозрачность */
+      backdrop-filter: blur(4px);
+      color: white; /* Белый текст */
       border-radius: 12px;
-      padding: 20px;
+      padding: 20px 15px; /* Уменьшил отступы */
       max-width: 500px;
       margin: 0 auto;
       text-align: center;
@@ -188,17 +189,23 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .upload-btn {
       display: inline-block;
       padding: 10px 20px;
-      background: #ff4b5c;
+      background: rgba(255, 75, 92, 0.85); /* Прозрачный акцентный цвет */
       color: white;
       border-radius: 8px;
       font-weight: 700;
       cursor: pointer;
       margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .upload-btn:hover {
+      background: rgba(255, 75, 92, 1);
     }
 
     #uploadStatus {
@@ -210,11 +217,12 @@
     }
 
     .status-item {
-      background: white;
-      color: #111;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
       padding: 8px 12px;
       border-radius: 8px;
       margin: 8px 0;
+      border-left: 3px solid #ff4b5c;
     }
 
     /* Сердечки */
@@ -297,7 +305,7 @@
       }
       
       .upload-box {
-        padding: 15px;
+        padding: 15px 10px;
       }
       
       footer {
@@ -368,62 +376,44 @@
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     
-    // Уникальный идентификатор пользователя
-    let userId = null;
+    // Уникальный идентификатор устройства
+    let deviceId = null;
 
-    // === ИНИЦИАЛИЗАЦИЯ АНОНИМНОЙ СЕССИИ ===
-    async function initAuth() {
-      try {
-        // Проверяем текущую сессию
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
+    // === ИНИЦИАЛИЗАЦИЯ УСТРОЙСТВА ===
+    function initDeviceId() {
+      // Проверяем, есть ли уже ID в localStorage
+      deviceId = localStorage.getItem('device_id');
+      
+      if (!deviceId) {
+        // Создаем новый уникальный ID
+        deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
         
-        if (error) throw error;
-        
-        if (session) {
-          // Сессия уже существует
-          userId = session.user.id;
-          console.log('Используем существующую сессию:', userId);
-        } else {
-          // Создаем новую анонимную сессию
-          const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({
-            email: `${Date.now()}@example.com`,
-            password: 'anonymous_password'
-          });
-          
-          if (signInError) throw signInError;
-          
-          userId = data.user.id;
-          console.log('Создана новая анонимная сессия:', userId);
-        }
-        
-        // Загружаем счётчик
-        loadCounter();
-      } catch (err) {
-        console.error('Ошибка аутентификации:', err);
-        // Если аутентификация не удалась, используем localStorage как fallback
-        initLocalStorageCounter();
+        // Сохраняем в localStorage
+        localStorage.setItem('device_id', deviceId);
       }
+      
+      console.log('Device ID:', deviceId);
+      loadCounter();
     }
 
     // === ЗАГРУЗКА СЧЁТЧИКА ИЗ SUPABASE ===
     async function loadCounter() {
-      if (!userId) {
-        initLocalStorageCounter();
-        return;
-      }
-      
       try {
         const { data, error } = await supabaseClient
           .from('clicks')
           .select('count')
-          .eq('user_id', userId)
+          .eq('device_id', deviceId)
           .single();
         
         if (error) {
           if (error.code === 'PGRST116') { // Запись не найдена
             await supabaseClient
               .from('clicks')
-              .insert([{ user_id: userId, count: 0 }]);
+              .insert([{ device_id: deviceId, count: 0 }]);
             updateCounterDisplay(0);
           } else {
             throw error;
@@ -433,52 +423,34 @@
         }
       } catch (err) {
         console.error('Ошибка загрузки счётчика:', err);
-        initLocalStorageCounter();
+        // Fallback на localStorage
+        const count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+        updateCounterDisplay(count);
       }
     }
 
     // === ОБНОВЛЕНИЕ СЧЁТЧИКА ===
-    async function updateCounter(newCount) {
-      if (!userId) {
-        // Fallback на localStorage
-        localStorage.setItem('zeffirkaClicks', newCount);
-        updateCounterDisplay(newCount);
-        return;
-      }
-      
+    async function incrementCounter() {
       try {
-        const { error } = await supabaseClient
-          .from('clicks')
-          .update({ count: newCount })
-          .eq('user_id', userId);
+        const { data, error } = await supabaseClient
+          .rpc('increment_click', { device_id: deviceId });
         
         if (error) throw error;
         
-        updateCounterDisplay(newCount);
+        updateCounterDisplay(data);
       } catch (err) {
-        console.error('Ошибка сохранения счётчика:', err);
+        console.error('Ошибка обновления счётчика:', err);
         // Fallback на localStorage
-        localStorage.setItem('zeffirkaClicks', newCount);
-        updateCounterDisplay(newCount);
+        let count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+        count++;
+        localStorage.setItem('zeffirkaClicks', count);
+        updateCounterDisplay(count);
       }
     }
 
     // === ОТОБРАЖЕНИЕ СЧЁТЧИКА ===
     function updateCounterDisplay(count) {
       document.getElementById('counter').textContent = count;
-    }
-
-    // === Fallback на localStorage ===
-    function initLocalStorageCounter() {
-      let count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
-      updateCounterDisplay(count);
-      
-      document.getElementById('mainBtn').addEventListener('click', () => {
-        count++;
-        localStorage.setItem('zeffirkaClicks', count);
-        updateCounterDisplay(count);
-        showToast();
-      });
     }
 
     // === УПРАВЛЕНИЕ ВКЛАДКАМИ ===
@@ -503,20 +475,9 @@
     });
 
     // === СЧЁТЧИК КЛИКОВ ===
-    document.getElementById('mainBtn').addEventListener('click', async () => {
-      try {
-        const { data: { count } } = await supabaseClient
-          .rpc('increment_click', { user_id: userId });
-        
-        updateCounterDisplay(count);
-        showToast();
-      } catch (err) {
-        console.error('Ошибка обновления счётчика:', err);
-        // Fallback на простое увеличение
-        const currentCount = parseInt(document.getElementById('counter').textContent);
-        updateCounter(currentCount + 1);
-        showToast();
-      }
+    document.getElementById('mainBtn').addEventListener('click', () => {
+      incrementCounter();
+      showToast();
     });
 
     // === ВСПЛЫВАЮЩЕЕ ОКНО ===
@@ -729,8 +690,8 @@
       setBodyHeight();
       window.addEventListener('resize', setBodyHeight);
       
-      // Инициализируем аутентификацию
-      initAuth();
+      // Инициализируем ID устройства
+      initDeviceId();
       
       // Если на вкладке галереи при загрузке - загружаем фото
       if (document.getElementById('gallery').classList.contains('active')) {
