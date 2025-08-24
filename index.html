@@ -163,7 +163,7 @@
 словами, что нашёл
 я для тебя.
 Спасибо тебе, что ты есть в моей жизни 💕</p>
-  <button class="main-btn" onclick="handleClick()">Нажми меня</button>
+  <button class="main-btn" id="mainBtn">Нажми меня</button>
   <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
   <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
 </div>
@@ -184,8 +184,8 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, listAll } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDF9V1fKurbqRPgv31mabmazhbKXtKfibE",
@@ -203,7 +203,6 @@ const photosDiv = document.getElementById("photos");
 const fileInput = document.getElementById("fileInput");
 const statusDiv = document.getElementById("uploadStatus");
 
-// Загружаем галерею
 async function loadGallery() {
   photosDiv.innerHTML = "";
   const listRef = ref(storage, "photos");
@@ -217,7 +216,6 @@ async function loadGallery() {
 }
 loadGallery();
 
-// Мультизагрузка с прогрессом
 fileInput.addEventListener("change", async (e) => {
   const files = e.target.files;
   if (!files.length) return;
@@ -265,13 +263,14 @@ fileInput.addEventListener("change", async (e) => {
     });
   });
 
-  // Главная кнопка и сердечки
+  // Счетчик и сердечки
   const counterElement = document.getElementById("clickCounter");
   let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
   counterElement.textContent = count;
 
   const toast = document.getElementById("loveToast");
   let isAnimating = false;
+
   function showToast() {
     if (isAnimating) return;
     isAnimating = true;
@@ -280,3 +279,27 @@ fileInput.addEventListener("change", async (e) => {
     toast.classList.add("show");
     setTimeout(() => {
       toast.classList.remove("show");
+      setTimeout(() => { isAnimating = false; }, 400);
+    }, 2500);
+  }
+
+  document.getElementById("mainBtn").addEventListener("click", () => {
+    count++;
+    counterElement.textContent = count;
+    localStorage.setItem("zeffirkaClicks", count);
+    showToast();
+  });
+
+  function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.top = window.innerHeight + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+  }
+  setInterval(createHeart, 500);
+</script>
+
+</body>
+</html>
