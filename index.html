@@ -2,17 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Для моей Зефирки</title>
   <style>
-    :root {
-      --accent: #ff4b5c;
-      --accent-dark: #e53b4c;
-      --glass: rgba(255, 255, 255, 0.1);
-      --glass-hover: rgba(255, 255, 255, 0.2);
-      --nav-height: 60px;
-    }
-
     * {
       margin: 0;
       padding: 0;
@@ -23,64 +15,55 @@
       min-height: 100vh;
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: url("background.jpg") no-repeat center center/cover;
+      background-size: cover;
       color: white;
       text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-      padding-top: var(--nav-height);
+      padding-top: 60px;
       overflow-x: hidden;
     }
 
-    /* НАВИГАЦИЯ */
+    /* Навигация */
     nav {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: var(--nav-height);
+      height: 60px;
       display: flex;
       justify-content: center;
-      gap: 12px;
-      background: rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(4px);
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.2);
       z-index: 1000;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .tab-btn {
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
       color: white;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 90px;
-    }
-
-    .tab-btn:hover {
-      background: var(--glass-hover);
-      transform: translateY(-2px);
+      transition: all 0.2s;
     }
 
     .tab-btn.active {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
     }
 
-    /* ОСНОВНОЕ СОДЕРЖИМОЕ */
+    /* Вкладки */
     .tab {
       display: none;
       padding: 20px;
-      min-height: calc(100vh - var(--nav-height));
+      min-height: calc(100vh - 60px);
     }
 
     .tab.active {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      display: block;
     }
 
-    /* ДОМАШНЯЯ СТРАНИЦА */
+    /* Главная страница */
     h1 {
       font-size: 2.2rem;
       margin: 10px 0 15px;
@@ -104,16 +87,10 @@
       border: none;
       border-radius: 30px;
       background: white;
-      color: var(--accent);
+      color: #ff4b5c;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    .main-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
     }
 
     .click-counter {
@@ -127,14 +104,14 @@
       position: absolute;
       bottom: 20px;
       font-size: 0.95rem;
-      max-width: 320px;
+      width: 100%;
       text-align: center;
       color: rgba(255, 255, 255, 0.9);
     }
 
-    /* ВСПЛЫВАЮЩЕЕ ОКНО */
+    /* Всплывающее окно */
     .toast {
-      position: absolute;
+      position: fixed;
       left: 50%;
       bottom: -60px;
       transform: translateX(-50%) scale(0.9);
@@ -157,11 +134,11 @@
       opacity: 1;
     }
 
-    /* ГАЛЕРЕЯ */
+    /* Галерея */
     .gallery-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
       width: 90%;
       max-width: 1100px;
       margin: 20px auto;
@@ -170,8 +147,7 @@
     .photo {
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       aspect-ratio: 1;
     }
 
@@ -181,37 +157,7 @@
       object-fit: cover;
     }
 
-    .caption {
-      position: absolute;
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
-      background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
-      color: white;
-      padding: 8px 10px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .remove-btn {
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    .remove-btn:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    /* ЗАГРУЗКА ФОТО */
+    /* Загрузка */
     .upload-box {
       background: rgba(255, 255, 255, 0.95);
       color: #222;
@@ -219,26 +165,23 @@
       padding: 20px;
       max-width: 500px;
       margin: 0 auto;
-      border: 2px dashed var(--accent);
+      text-align: center;
     }
 
     .upload-btn {
       display: inline-block;
       padding: 10px 20px;
-      background: var(--accent);
+      background: #ff4b5c;
       color: white;
       border-radius: 8px;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .upload-btn:hover {
-      background: var(--accent-dark);
+      margin-top: 10px;
     }
 
     #uploadStatus {
       margin-top: 15px;
+      text-align: left;
     }
 
     .status-item {
@@ -247,30 +190,14 @@
       padding: 8px 12px;
       border-radius: 8px;
       margin: 8px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .status-left {
-      flex: 1;
-      text-align: left;
-      word-break: break-word;
-    }
-
-    .status-right {
-      min-width: 60px;
-      text-align: right;
-      font-weight: 700;
-      color: #555;
-    }
-
-    /* ЛЕТАЮЩИЕ СЕРДЦА */
+    /* Сердечки */
     .heart {
-      position: absolute;
+      position: fixed;
       width: 16px;
       height: 16px;
-      background: var(--accent);
+      background: #ff4b5c;
       transform: rotate(45deg);
       opacity: 0.8;
       pointer-events: none;
@@ -283,7 +210,7 @@
       position: absolute;
       width: 16px;
       height: 16px;
-      background: var(--accent);
+      background: #ff4b5c;
       border-radius: 50%;
     }
 
@@ -299,17 +226,17 @@
   </style>
 </head>
 <body>
-  <!-- НАВИГАЦИЯ -->
+  <!-- Навигация -->
   <nav>
     <button class="tab-btn active" data-tab="home">Главная</button>
     <button class="tab-btn" data-tab="gallery">Галерея</button>
     <button class="tab-btn" data-tab="upload">Загрузка</button>
   </nav>
 
-  <!-- ВСПЛЫВАЮЩЕЕ ОКНО -->
+  <!-- Всплывающее окно -->
   <div id="toast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
-  <!-- ДОМАШНЯЯ СТРАНИЦА -->
+  <!-- Главная страница -->
   <div id="home" class="tab active">
     <h1>Зефирка моя,<br>я тебя люблю ❤️</h1>
     
@@ -324,367 +251,319 @@
 Спасибо тебе, что ты есть в моей жизни 💕
     </div>
     
-    <button class="main-btn">Нажми меня</button>
+    <button class="main-btn" id="mainBtn">Нажми меня</button>
     <div class="click-counter">Кликов: <span id="counter">0</span></div>
     
     <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
   </div>
 
-  <!-- ГАЛЕРЕЯ -->
+  <!-- Галерея -->
   <div id="gallery" class="tab">
-    <div class="gallery-container" id="gallery-container"></div>
+    <div class="gallery-container" id="galleryContainer"></div>
   </div>
 
-  <!-- ЗАГРУЗКА ФОТО -->
+  <!-- Загрузка -->
   <div id="upload" class="tab">
     <div class="upload-box">
-      <h3 style="margin-bottom: 10px;">Выбери фото для загрузки 💖</h3>
+      <h3>Выбери фото для загрузки 💖</h3>
       <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-      <label for="fileInput" class="upload-btn">Выбрать фото</label>
+      <div class="upload-btn">Выбрать фото</div>
       <div id="uploadStatus"></div>
     </div>
   </div>
 
-  <!-- ПОДКЛЮЧЕНИЕ SUPABASE -->
+  <!-- Подключаем Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // === НАСТРОЙКИ ===
+    // === НАСТРОЙКИ (убедись, что здесь НЕТ ПРОБЕЛОВ!) ===
     const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
     const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
 
     // Создаем клиент Supabase
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === ФУНКЦИИ ===
-    // Проверка доступности localStorage
+    // === ПРОВЕРКА localStorage ===
     const storageAvailable = () => {
       try {
-        const x = '__storage_test__';
-        localStorage.setItem(x, x);
-        localStorage.removeItem(x);
+        const test = '__storage_test__';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
         return true;
       } catch (e) {
         return false;
       }
     };
 
-    // Управление вкладками
-    const initTabs = () => {
-      const tabBtns = document.querySelectorAll('.tab-btn');
-      const tabs = document.querySelectorAll('.tab');
-
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          tabBtns.forEach(b => b.classList.remove('active'));
-          tabs.forEach(t => t.classList.remove('active'));
-          
-          btn.classList.add('active');
-          document.getElementById(btn.dataset.tab).classList.add('active');
-          
-          // При переключении на галерею - загружаем фото
-          if (btn.dataset.tab === 'gallery') {
-            loadGallery();
-          }
+    // === УПРАВЛЕНИЕ ВКЛАДКАМИ ===
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Скрываем все вкладки
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.classList.remove('active');
         });
+        
+        // Убираем активный класс со всех кнопок
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active');
+        });
+        
+        // Показываем выбранную вкладку
+        const tabId = btn.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+        
+        // Делаем кнопку активной
+        btn.classList.add('active');
+        
+        // Если переключились на галерею, загружаем фото
+        if (tabId === 'gallery') {
+          loadGallery();
+        }
       });
-    };
+    });
 
-    // Всплывающее окно
-    const initToast = () => {
-      const toast = document.getElementById('toast');
-      let isAnimating = false;
+    // === СЧЁТЧИК КЛИКОВ ===
+    const counterEl = document.getElementById('counter');
+    let count = 0;
 
-      return () => {
-        if (isAnimating) return;
-        isAnimating = true;
-        
-        toast.classList.remove('show');
-        void toast.offsetWidth;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-          toast.classList.remove('show');
-          setTimeout(() => isAnimating = false, 400);
-        }, 2400);
-      };
-    };
+    // Загружаем из localStorage
+    if (storageAvailable()) {
+      count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+    }
+    counterEl.textContent = count;
 
-    // Счётчик кликов
-    const initCounter = (showToast) => {
-      const counterEl = document.getElementById('counter');
-      let count = 0;
-      
-      if (storageAvailable()) {
-        count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
-      }
-      
+    // Обработчик клика
+    document.getElementById('mainBtn').addEventListener('click', () => {
+      count++;
       counterEl.textContent = count;
       
-      document.querySelector('.main-btn').addEventListener('click', () => {
-        count++;
-        counterEl.textContent = count;
+      if (storageAvailable()) {
+        localStorage.setItem('zeffirkaClicks', count);
+      }
+      
+      showToast();
+    });
+
+    // === ВСПЛЫВАЮЩЕЕ ОКНО ===
+    const toast = document.getElementById('toast');
+    let isAnimating = false;
+
+    function showToast() {
+      if (isAnimating) return;
+      isAnimating = true;
+      
+      // Сброс анимации
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      
+      // Показываем
+      toast.classList.add('show');
+      
+      // Скрываем через 2.4 секунды
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+          isAnimating = false;
+        }, 400);
+      }, 2400);
+    }
+
+    // === ЛЕТАЮЩИЕ СЕРДЦА ===
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      
+      // Случайное положение
+      const size = 16;
+      const left = Math.random() * (window.innerWidth - size);
+      const top = window.innerHeight;
+      
+      heart.style.left = `${left}px`;
+      heart.style.top = `${top}px`;
+      
+      // Добавляем в документ
+      document.body.appendChild(heart);
+      
+      // Анимация
+      heart.animate([
+        { transform: 'translateY(0) rotate(45deg)', opacity: 0.8 },
+        { transform: `translateY(-${window.innerHeight + 100}px) rotate(45deg)`, opacity: 0 }
+      ], {
+        duration: 4000,
+        easing: 'linear'
+      });
+      
+      // Удаляем после анимации
+      setTimeout(() => {
+        heart.remove();
+      }, 4000);
+    }
+    
+    // Запускаем анимацию сердечек
+    setInterval(createHeart, 500);
+
+    // === ГАЛЕРЕЯ ===
+    const galleryContainer = document.getElementById('galleryContainer');
+
+    async function loadGallery() {
+      // Показываем индикатор загрузки
+      galleryContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
+          Загрузка галереи...
+        </div>
+      `;
+      
+      try {
+        const { data, error } = await supabaseClient
+          .from('photos')
+          .select('*')
+          .order('created_at', { ascending: false });
         
-        if (storageAvailable()) {
-          localStorage.setItem('zeffirkaClicks', count);
+        if (error) {
+          throw new Error(`Supabase error: ${error.message}`);
         }
         
-        showToast();
-      });
-    };
-
-    // Летающие сердечки
-    const initHearts = () => {
-      setInterval(() => {
-        const heart = document.createElement('div');
-        heart.className = 'heart';
+        if (!data || data.length === 0) {
+          galleryContainer.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
+              Пока нет загруженных фото
+            </div>
+          `;
+          return;
+        }
         
-        // Случайное положение
-        const size = 16;
-        const left = Math.random() * (window.innerWidth - size);
-        const top = window.innerHeight;
+        // Очищаем контейнер
+        galleryContainer.innerHTML = '';
         
-        heart.style.left = `${left}px`;
-        heart.style.top = `${top}px`;
-        
-        // Добавляем в документ
-        document.body.appendChild(heart);
-        
-        // Анимация
-        const animation = heart.animate([
-          { transform: 'translateY(0) rotate(45deg)', opacity: 0.8 },
-          { transform: `translateY(-${window.innerHeight + 100}px) rotate(45deg)`, opacity: 0 }
-        ], {
-          duration: 4000,
-          easing: 'linear'
+        // Добавляем фото
+        data.forEach(photo => {
+          const photoEl = document.createElement('div');
+          photoEl.className = 'photo';
+          
+          const img = document.createElement('img');
+          img.src = photo.url;
+          img.alt = photo.name || 'Фото';
+          img.loading = 'lazy';
+          
+          photoEl.appendChild(img);
+          galleryContainer.appendChild(photoEl);
         });
-        
-        // Удаляем после анимации
-        animation.onfinish = () => heart.remove();
-      }, 500);
-    };
+      } catch (err) {
+        console.error('Ошибка загрузки галереи:', err);
+        galleryContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #ff4b5c;">
+            Ошибка загрузки галереи
+          </div>
+        `;
+      }
+    }
 
-    // Галерея
-    const initGallery = () => {
-      const galleryContainer = document.getElementById('gallery-container');
+    // === ЗАГРУЗКА ФОТО ===
+    const fileInput = document.getElementById('fileInput');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadBtn = document.querySelector('.upload-btn');
+
+    // При клике на кнопку загрузки
+    uploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Обработка выбора файлов
+    fileInput.addEventListener('change', async () => {
+      const files = Array.from(fileInput.files);
+      if (files.length === 0) return;
       
-      const loadGallery = async () => {
-        galleryContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">Загрузка галереи...</div>';
+      // Очищаем статус
+      uploadStatus.innerHTML = '';
+      
+      for (const file of files) {
+        // Создаем элемент статуса
+        const statusItem = document.createElement('div');
+        statusItem.className = 'status-item';
+        statusItem.innerHTML = `
+          <div class="status-left">${file.name}</div>
+          <div class="status-right">0%</div>
+        `;
+        uploadStatus.appendChild(statusItem);
+        
+        const statusRight = statusItem.querySelector('.status-right');
         
         try {
-          const { data, error } = await supabase
-            .from('photos')
-            .select('*')
-            .order('created_at', { ascending: false });
+          // Загружаем на IMGBB
+          statusRight.textContent = 'Загрузка...';
           
-          if (error) throw error;
-          
-          galleryContainer.innerHTML = '';
-          
-          if (!data || data.length === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.style.gridColumn = '1 / -1';
-            emptyMsg.style.textAlign = 'center';
-            emptyMsg.style.padding = '20px';
-            emptyMsg.style.color = 'rgba(255,255,255,0.7)';
-            emptyMsg.textContent = 'Пока нет загруженных фото';
-            galleryContainer.appendChild(emptyMsg);
-            return;
-          }
-          
-          data.forEach(photo => {
-            const photoEl = document.createElement('div');
-            photoEl.className = 'photo';
-            
-            const img = document.createElement('img');
-            img.src = photo.url;
-            img.alt = photo.name || 'Фото';
-            img.loading = 'lazy';
-            
-            const caption = document.createElement('div');
-            caption.className = 'caption';
-            
-            const name = document.createElement('div');
-            name.textContent = photo.name || '';
-            
-            const actions = document.createElement('div');
-            actions.style.display = 'flex';
-            actions.style.gap = '8px';
-            actions.style.alignItems = 'center';
-            
-            const date = document.createElement('div');
-            date.style.fontSize = '0.8rem';
-            date.style.opacity = '0.8';
-            try {
-              date.textContent = new Date(photo.created_at).toLocaleDateString();
-            } catch (e) {
-              date.textContent = '';
-            }
-            
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-btn';
-            removeBtn.textContent = 'Удалить';
-            removeBtn.addEventListener('click', async (e) => {
-              e.stopPropagation();
-              if (!confirm('Удалить это фото?')) return;
-              
-              try {
-                await supabase
-                  .from('photos')
-                  .delete()
-                  .eq('id', photo.id);
-                
-                photoEl.remove();
-              } catch (err) {
-                alert('Ошибка при удалении');
-                console.error('Delete error:', err);
-              }
-            });
-            
-            actions.appendChild(date);
-            actions.appendChild(removeBtn);
-            caption.appendChild(name);
-            caption.appendChild(actions);
-            
-            photoEl.appendChild(img);
-            photoEl.appendChild(caption);
-            galleryContainer.appendChild(photoEl);
-          });
-        } catch (err) {
-          galleryContainer.innerHTML = '';
-          const errorMsg = document.createElement('div');
-          errorMsg.style.gridColumn = '1 / -1';
-          errorMsg.style.textAlign = 'center';
-          errorMsg.style.padding = '20px';
-          errorMsg.style.color = 'rgba(255,255,255,0.7)';
-          errorMsg.textContent = 'Ошибка загрузки галереи';
-          galleryContainer.appendChild(errorMsg);
-          console.error('Gallery load error:', err);
-        }
-      };
-      
-      return { loadGallery };
-    };
-
-    // Загрузка фото
-    const initUploader = () => {
-      const fileInput = document.getElementById('fileInput');
-      const uploadStatus = document.getElementById('uploadStatus');
-      
-      const uploadToImgbb = (file, onProgress) => {
-        return new Promise((resolve, reject) => {
           const formData = new FormData();
           formData.append('image', file);
           
           const xhr = new XMLHttpRequest();
           xhr.open('POST', `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`);
           
+          // Отслеживаем прогресс
           xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable && onProgress) {
+            if (e.lengthComputable) {
               const percent = Math.round((e.loaded / e.total) * 100);
-              onProgress(percent);
+              statusRight.textContent = `${percent}%`;
             }
           };
           
-          xhr.onload = () => {
+          // Обрабатываем результат
+          xhr.onload = async () => {
             if (xhr.status === 200) {
               try {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success && response.data && response.data.url) {
-                  resolve(response.data.url);
+                  const imageUrl = response.data.url;
+                  
+                  statusRight.textContent = 'Сохранение...';
+                  
+                  // Сохраняем в Supabase
+                  const { error } = await supabaseClient
+                    .from('photos')
+                    .insert([{ name: file.name, url: imageUrl }]);
+                  
+                  if (error) throw error;
+                  
+                  statusRight.textContent = 'Готово!';
+                  setTimeout(() => {
+                    statusItem.style.opacity = '0.5';
+                  }, 1500);
                 } else {
-                  reject(new Error('Invalid response from IMGBB'));
+                  throw new Error('Invalid IMGBB response');
                 }
               } catch (err) {
-                reject(err);
+                console.error('Supabase error:', err);
+                statusRight.textContent = 'Ошибка';
+                statusRight.style.color = '#e74c3c';
               }
             } else {
-              reject(new Error(`HTTP ${xhr.status}`));
+              throw new Error(`HTTP ${xhr.status}`);
             }
           };
           
-          xhr.onerror = () => reject(new Error('Network error'));
-          xhr.send(formData);
-        });
-      };
-      
-      const handleFileUpload = async () => {
-        const files = Array.from(fileInput.files);
-        if (files.length === 0) return;
-        
-        uploadStatus.innerHTML = '';
-        
-        for (const file of files) {
-          // Создаем элемент статуса
-          const statusItem = document.createElement('div');
-          statusItem.className = 'status-item';
-          
-          const statusLeft = document.createElement('div');
-          statusLeft.className = 'status-left';
-          statusLeft.textContent = file.name;
-          
-          const statusRight = document.createElement('div');
-          statusRight.className = 'status-right';
-          statusRight.textContent = '0%';
-          
-          statusItem.appendChild(statusLeft);
-          statusItem.appendChild(statusRight);
-          uploadStatus.appendChild(statusItem);
-          
-          try {
-            // Загружаем на IMGBB
-            statusRight.textContent = 'Загрузка...';
-            const imageUrl = await uploadToImgbb(file, percent => {
-              statusRight.textContent = `${percent}%`;
-            });
-            
-            // Сохраняем в Supabase
-            statusRight.textContent = 'Сохранение...';
-            const { error } = await supabase
-              .from('photos')
-              .insert([{ 
-                name: file.name, 
-                url: imageUrl 
-              }]);
-            
-            if (error) throw error;
-            
-            statusRight.textContent = 'Готово!';
-            setTimeout(() => {
-              statusItem.style.opacity = '0.5';
-              setTimeout(() => statusItem.remove(), 1000);
-            }, 1500);
-            
-          } catch (err) {
-            console.error('Upload error:', err);
-            statusRight.textContent = 'Ошибка';
+          // Обработка ошибок
+          xhr.onerror = () => {
+            console.error('Network error');
+            statusRight.textContent = 'Ошибка сети';
             statusRight.style.color = '#e74c3c';
-          }
+          };
+          
+          // Отправляем запрос
+          xhr.send(formData);
+        } catch (err) {
+          console.error('Upload error:', err);
+          statusRight.textContent = 'Ошибка';
+          statusRight.style.color = '#e74c3c';
         }
-        
-        // Очищаем выбор файлов
-        fileInput.value = '';
-      };
+      }
       
-      fileInput.addEventListener('change', handleFileUpload);
-      document.querySelector('.upload-btn').addEventListener('click', () => {
-        fileInput.click();
-      });
-    };
+      // Сбрасываем выбор файлов
+      fileInput.value = '';
+    });
 
     // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', () => {
-      // Инициализируем компоненты
-      initTabs();
-      const showToast = initToast();
-      initCounter(showToast);
-      initHearts();
-      
-      // Инициализируем галерею и загрузку
-      const { loadGallery } = initGallery();
-      initUploader();
-      
-      // Загружаем галерею при старте, если мы на вкладке галереи
+      // Если на вкладке галереи при загрузке - загружаем фото
       if (document.getElementById('gallery').classList.contains('active')) {
         loadGallery();
       }
