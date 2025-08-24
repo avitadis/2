@@ -6,198 +6,111 @@
 <title>Для моей Зефирки</title>
 <style>
   :root{
-    --accent:#ff4b5c;
-    --accent-dark:#e53b4c;
-    --glass: rgba(255,255,255,0.12);
-    --glass-hover: rgba(255,255,255,0.22);
+    --accent: #ff4b5c;
+    --accent-dark: #e53b4c;
+    --glass: rgba(255,255,255,0.10);
+    --glass-hover: rgba(255,255,255,0.20);
+    --nav-height: 64px;
+    --max-content-width: 1100px;
   }
 
-  html,body{height:100%;margin:0;}
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased;}
   body {
-    margin: 0;
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    margin:0;
+    padding-top: var(--nav-height); /* чтобы nav не перекрывал контент */
     background: url("background.jpg") no-repeat center center/cover;
+    background-size: cover;
     color: white;
     text-align: center;
     overflow-x: hidden;
-    -webkit-font-smoothing:antialiased;
   }
 
-  /* NAV - убрал сплошную подложку, кнопки полупрозрачные */
+  /* NAV */
   nav {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding: 10px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    /* прозрачный фон, пусть видно background.jpg */
-    background: transparent;
+    height: var(--nav-height);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    position: fixed;
+    left:0; right:0; top:0;
+    z-index: 999;
+    background: transparent; /* прозрачная подложка как просил */
     backdrop-filter: blur(4px);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
   }
   nav button {
     padding: 10px 18px;
-    border: 1px solid rgba(255,255,255,0.12);
+    min-width: 88px;
     border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.12);
     background: var(--glass);
     color: white;
     font-weight: 700;
     cursor: pointer;
-    transition: all .18s ease;
-    min-width: 92px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    text-transform:none;
+    transition: transform .15s ease, background .15s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   }
   nav button:hover { background: var(--glass-hover); transform: translateY(-2px); }
-  nav button.active { outline: 2px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.18); }
+  nav button.active { background: rgba(255,255,255,0.18); outline: 2px solid rgba(255,255,255,0.06); }
 
-  /* Tabs */
-  .tab { display:none; flex-direction:column; align-items:center; justify-content:flex-start; padding:24px 12px 60px; min-height: calc(100vh - 72px); box-sizing:border-box; }
-  .tab.active{ display:flex; }
+  /* Tabs area */
+  .tab { display:none; padding: 18px 12px 60px; min-height: calc(100vh - var(--nav-height)); align-items:center; justify-content:flex-start; box-sizing:border-box; }
+  .tab.active { display:flex; flex-direction:column; }
 
-  /* Главная */
-  h1 { font-size: 2.4rem; margin: 10px 0 12px; text-shadow: 2px 2px 12px rgba(0,0,0,0.6); line-height:1.05; }
+  /* HOME */
+  h1 { font-size: 2.2rem; margin: 8px 0 8px; text-shadow: 1px 1px 10px rgba(0,0,0,0.6); line-height:1.05; }
   .poem {
-    font-size: 1.05rem;
-    max-width: 720px;
-    margin: 0 12px 18px;
-    white-space: pre-line;
-    text-shadow: 1px 1px 6px rgba(0,0,0,0.6);
-    color: #fff;
+    font-size: 1.05rem; max-width: 720px; margin: 0 auto 18px; white-space: pre-line;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.6); color: #fff;
     background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06));
-    padding: 12px 14px;
-    border-radius: 12px;
+    padding: 12px 14px; border-radius: 12px;
   }
   .main-btn {
-    padding: 12px 26px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 25px;
-    background: white;
-    color: var(--accent);
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform .18s ease;
+    padding: 12px 26px; font-size: 1rem; border: none; border-radius: 25px;
+    background: white; color: var(--accent); font-weight: 800; cursor: pointer;
     box-shadow: 0 6px 18px rgba(0,0,0,0.25);
   }
   .main-btn:hover { transform: scale(1.03); }
-
-  .click-counter { font-size: 1rem; margin: 10px 0; text-shadow: 1px 1px 5px rgba(0,0,0,0.6); }
-  footer { margin-top: 18px; font-size: 0.98rem; max-width: 760px; color:#fff; opacity:0.95; }
+  .click-counter { font-size: 1rem; margin: 10px 0; text-shadow: 1px 1px 6px rgba(0,0,0,0.5); }
+  footer { margin-top: 14px; font-size: 0.95rem; color: #fff; opacity: 0.95; }
 
   /* Hearts */
-  .heart {
-    position: absolute;
-    width: 18px; height: 18px;
-    background: var(--accent);
-    transform: rotate(45deg);
-    animation: floatUp 4s linear infinite;
-    opacity: 0.85;
-    pointer-events: none;
-  }
+  .heart { position: absolute; width: 18px; height: 18px; background: var(--accent); transform: rotate(45deg); animation: floatUp 4s linear infinite; opacity: .9; pointer-events:none; }
   .heart::before, .heart::after { content:""; position:absolute; width:18px; height:18px; background:var(--accent); border-radius:50%; }
   .heart::before { top:-9px; left:0; } .heart::after { left:-9px; top:0; }
-  @keyframes floatUp { 0% { transform: translateY(0) rotate(45deg); opacity:1; } 100% { transform: translateY(-620px) rotate(45deg); opacity:0; } }
+  @keyframes floatUp { 0% { transform: translateY(0) rotate(45deg); opacity:1 } 100% { transform: translateY(-620px) rotate(45deg); opacity:0 } }
 
   /* Toast */
-  .toast {
-    position: fixed;
-    left: 50%;
-    bottom: -90px;
-    transform: translateX(-50%) scale(0.95);
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 14px 28px;
-    border-radius: 28px;
-    font-size: 1.12rem;
-    font-weight: 700;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-    z-index: 120;
-    opacity: 0;
-    transition: all .35s cubic-bezier(.2,.9,.2,1);
-    white-space: nowrap;
-  }
-  .toast.show { bottom: 36px; opacity: 1; transform: translateX(-50%) scale(1); }
+  .toast { position: fixed; left:50%; bottom:-90px; transform:translateX(-50%) scale(.95); background:rgba(0,0,0,0.85); color:white; padding:12px 22px; border-radius:26px; font-weight:700; z-index:1200; opacity:0; transition: all .35s cubic-bezier(.2,.9,.2,1); white-space:nowrap; }
+  .toast.show { bottom:36px; opacity:1; transform:translateX(-50%) scale(1); }
 
   /* Upload box */
-  .upload-box {
-    margin: 18px auto;
-    padding: 18px;
-    border: 2px dashed var(--accent);
-    border-radius: 14px;
-    max-width: 720px;
-    background: rgba(255,245,246,0.9);
-    color: #222;
-    box-sizing: border-box;
-  }
-  input[type="file"] { display:none; }
-  label.upload-btn {
-    display:inline-block;
-    padding: 10px 18px;
-    background: var(--accent);
-    color: white;
-    border-radius: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    margin-top: 10px;
-  }
+  .upload-box { margin: 18px auto; padding: 16px; border-radius: 12px; max-width: var(--max-content-width); background: rgba(255,245,246,0.95); color:#222; border: 2px dashed var(--accent); }
+  label.upload-btn { display:inline-block; padding: 10px 16px; background: var(--accent); color:white; border-radius:10px; font-weight:800; cursor:pointer; }
   label.upload-btn:hover { background: var(--accent-dark); }
 
   #uploadStatus { margin-top:12px; text-align:left; }
-  .status-item {
-    margin: 8px 0;
-    color: #222;
-    font-weight: 700;
-    background: rgba(255,255,255,0.96);
-    padding: 10px 12px;
-    border-radius: 10px;
-    overflow-wrap:anywhere;
-    display:flex;
-    gap:12px;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .status-left { flex:1; text-align:left; word-break:break-word; color:#111; }
+  .status-item { margin: 8px 0; background: #fff; color:#111; padding:8px 10px; border-radius:8px; display:flex; gap:12px; align-items:center; justify-content:space-between; overflow-wrap:anywhere; }
+  .status-left { flex:1; text-align:left; word-break:break-word; }
   .status-right { min-width:70px; text-align:right; color:#555; font-weight:700; }
 
-  /* Gallery grid */
-  #gallery {
-    display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
-    width: 92%;
-    max-width: 1100px;
-    margin: 14px auto 40px;
-    box-sizing: border-box;
-  }
-  .photo {
-    position:relative;
-    border-radius:12px;
-    overflow:hidden;
-    background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.04));
-    box-shadow: 0 8px 26px rgba(0,0,0,0.35);
-  }
-  .photo img{ display:block; width:100%; height:auto; object-fit:cover; }
-  .photo .caption {
-    position:absolute; left:8px; bottom:8px; right:8px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.55));
-    color:white; padding:8px 10px; border-radius:10px;
-    display:flex; justify-content:space-between; gap:8px; align-items:center; font-size:0.92rem;
-  }
-  .remove-btn {
-    background: rgba(255,255,255,0.12);
-    color: white; border: none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:700;
-  }
+  /* Gallery */
+  #gallery { width:92%; max-width: var(--max-content-width); margin: 18px auto 80px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:14px; }
+  .photo { position:relative; border-radius:12px; overflow:hidden; background: rgba(0,0,0,0.06); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+  .photo img { width:100%; height:100%; display:block; object-fit:cover; }
+  .caption { position:absolute; left:8px; right:8px; bottom:8px; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.55)); color:white; padding:8px 10px; border-radius:8px; display:flex; justify-content:space-between; gap:8px; align-items:center; }
+  .remove-btn { background: rgba(255,255,255,0.12); color:white; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
   .remove-btn:hover { background: rgba(255,255,255,0.22); }
 
-  /* small screens */
-  @media (max-width:640px){
-    h1{font-size:1.9rem;}
-    .poem{font-size:0.98rem; padding:10px;}
+  /* responsive */
+  @media(max-width:640px) {
+    :root { --nav-height: 56px; }
+    body { padding-top: var(--nav-height); }
+    h1 { font-size:1.7rem; }
+    .poem { font-size:0.98rem; }
     .upload-box { padding:12px; }
-    nav{gap:8px;}
-    nav button{min-width:74px;padding:8px 12px;}
   }
 </style>
 </head>
@@ -209,7 +122,6 @@
   <button class="tab-btn" data-tab="upload">Загрузка</button>
 </nav>
 
-<!-- Toast -->
 <div id="loveToast" class="toast">И БУДУ ЛЮБИТЬ ВСЕГДА 💖</div>
 
 <!-- HOME -->
@@ -225,45 +137,33 @@
 я для тебя.
 Спасибо тебе, что ты есть в моей жизни 💕
   </div>
-
   <button class="main-btn" id="mainBtn">Нажми меня</button>
   <div class="click-counter">Кликов: <span id="clickCounter">0</span></div>
   <footer>Если вдруг ты стала забывать, как я тебя люблю, он будет здесь всегда 🌹</footer>
 </div>
 
 <!-- GALLERY -->
-<div id="gallery" class="tab" aria-live="polite">
-  <!-- Заполняется скриптом -->
-</div>
+<div id="gallery" class="tab" aria-live="polite"></div>
 
 <!-- UPLOAD -->
 <div id="upload" class="tab">
   <div class="upload-box">
-    <h3 style="margin:0 0 8px 0;color:#222;">Выбери фото для загрузки 💖</h3>
+    <h3 style="margin:0 0 8px 0; color:#222;">Выбери фото для загрузки 💖</h3>
     <input type="file" id="fileInput" accept="image/*" multiple />
     <label for="fileInput" class="upload-btn">Выбрать фото</label>
     <div id="uploadStatus" aria-live="polite"></div>
-    <p style="margin-top:10px;color:#333;font-size:0.95rem;">Фото загружаются на imgbb и автоматически сохраняются в базе (Supabase). Удалять фото можно здесь — они удалятся и из базы.</p>
+    <p style="margin-top:10px;color:#333;font-size:0.95rem;">Фото загружаются на imgbb и сохраняются в базе (Supabase), если она доступна. При недоступности Supabase — фото будут видны локально.</p>
   </div>
 </div>
 
 <script type="module">
-/* -----------------------
-   Supabase + IMGBB integration
-   ----------------------- */
-
-/* Supabase credentials — использованы те, что ты прислал */
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
+/* Robust initialization: dynamic import for Supabase (so page still loads if import fails) */
+let supabase = null;
 const SUPABASE_URL = "https://pikpwcilgcudrzldsirq.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpa3B3Y2lsZ2N1ZHJ6bGRzaXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMjExMDMsImV4cCI6MjA3MTU5NzEwM30.LroYNNZdmUikcEo5vKWUIqOEI0bJpgM_l8f5SpZq5GA";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-/* IMGBB API key (тот, что у тебя был) */
 const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
 
-/* Tabs behavior */
+/* Tabs */
 const tabBtns = document.querySelectorAll(".tab-btn");
 const tabs = document.querySelectorAll(".tab");
 tabBtns.forEach(btn => {
@@ -271,19 +171,16 @@ tabBtns.forEach(btn => {
     tabBtns.forEach(b => b.classList.remove("active"));
     tabs.forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
-    const targetId = btn.dataset.tab;
-    const target = document.getElementById(targetId);
-    if (target) target.classList.add("active");
-    // scroll to top of tab to avoid weird visual jump
+    const target = document.getElementById(btn.dataset.tab);
+    if(target) target.classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 });
 
-/* Click counter + toast logic */
+/* Counter + toast */
 const counterElement = document.getElementById("clickCounter");
 let count = parseInt(localStorage.getItem("zeffirkaClicks")) || 0;
 counterElement.textContent = count;
-
 const toast = document.getElementById("loveToast");
 let toastAnimating = false;
 function showToast(){
@@ -292,113 +189,112 @@ function showToast(){
   toast.classList.remove("show");
   void toast.offsetWidth;
   toast.classList.add("show");
-  setTimeout(()=>{ toast.classList.remove("show"); setTimeout(()=>{ toastAnimating=false; }, 380); }, 2400);
+  setTimeout(()=>{ toast.classList.remove("show"); setTimeout(()=>{ toastAnimating=false }, 380); }, 2400);
 }
-
-document.getElementById("mainBtn").addEventListener("click", ()=>{
-  count++;
-  counterElement.textContent = count;
-  localStorage.setItem("zeffirkaClicks", count);
-  showToast();
-});
+document.getElementById("mainBtn").addEventListener("click", ()=>{ count++; counterElement.textContent = count; localStorage.setItem("zeffirkaClicks", count); showToast(); });
 
 /* Hearts */
-function createHeart(){
-  const heart = document.createElement("div");
-  heart.className = "heart";
-  heart.style.left = Math.random() * (window.innerWidth - 40) + "px";
-  heart.style.top = (window.innerHeight + 20) + "px";
-  document.body.appendChild(heart);
-  setTimeout(()=> heart.remove(), 4200);
-}
+function createHeart(){ const heart = document.createElement("div"); heart.className="heart"; heart.style.left = (Math.random()*(window.innerWidth-40)) + "px"; heart.style.top = (window.innerHeight + 20) + "px"; document.body.appendChild(heart); setTimeout(()=> heart.remove(), 4200); }
 setInterval(createHeart, 520);
 
 /* Gallery utilities */
 const gallery = document.getElementById("gallery");
-
 function createPhotoElement(photo){
-  // photo: { id, url, name, uploaded_at }
   const wrapper = document.createElement("div");
   wrapper.className = "photo";
-
   const img = document.createElement("img");
   img.src = photo.url;
   img.alt = photo.name || "Фото";
   img.loading = "lazy";
+  wrapper.appendChild(img);
 
   const caption = document.createElement("div");
   caption.className = "caption";
-
-  const nameSpan = document.createElement("div");
-  nameSpan.textContent = photo.name || "";
-
-  const rightGroup = document.createElement("div");
+  const left = document.createElement("div"); left.textContent = photo.name || "";
+  const right = document.createElement("div");
+  right.style.display = "flex"; right.style.gap = "8px"; right.style.alignItems="center";
 
   const dateSpan = document.createElement("div");
-  dateSpan.style.fontSize = "0.8rem";
-  dateSpan.style.opacity = "0.9";
-  try {
-    dateSpan.textContent = new Date(photo.uploaded_at).toLocaleString();
-  } catch(e){ dateSpan.textContent = ""; }
+  dateSpan.style.fontSize = "0.8rem"; dateSpan.style.opacity = "0.95";
+  try { dateSpan.textContent = photo.uploaded_at ? new Date(photo.uploaded_at).toLocaleString() : ""; } catch(e){ dateSpan.textContent = ""; }
 
   const removeBtn = document.createElement("button");
-  removeBtn.className = "remove-btn";
-  removeBtn.textContent = "Удалить";
+  removeBtn.className = "remove-btn"; removeBtn.textContent = "Удалить";
   removeBtn.addEventListener("click", async (ev) => {
     ev.stopPropagation();
-    if(!confirm("Удалить это фото из галереи и из базы?")) return;
+    if (!confirm("Удалить это фото? (из базы и из галереи)")) return;
     try {
-      // delete from supabase
-      const { error } = await supabase.from("photos").delete().eq("id", photo.id);
-      if (error) throw error;
-      // remove from DOM
+      if (supabase) {
+        const { error } = await supabase.from("photos").delete().eq("id", photo.id);
+        if (error) throw error;
+      } else {
+        // remove from localStorage fallback
+        let arr = JSON.parse(localStorage.getItem("photos_offline")||"[]");
+        arr = arr.filter(p => p.localId !== photo.localId && p.url !== photo.url);
+        localStorage.setItem("photos_offline", JSON.stringify(arr));
+      }
       wrapper.remove();
     } catch (err) {
-      console.error("Supabase delete error:", err);
+      console.error("Delete error:", err);
       alert("Ошибка при удалении (см. консоль).");
     }
   });
 
-  rightGroup.appendChild(dateSpan);
-  rightGroup.appendChild(removeBtn);
-
-  caption.appendChild(nameSpan);
-  caption.appendChild(rightGroup);
-
-  wrapper.appendChild(img);
+  right.appendChild(dateSpan);
+  right.appendChild(removeBtn);
+  caption.appendChild(left);
+  caption.appendChild(right);
   wrapper.appendChild(caption);
-
   return wrapper;
 }
 
-/* Load gallery from Supabase */
+/* Load gallery: prefer Supabase, fallback to localStorage 'photos_offline' */
 async function loadGallery(){
-  gallery.innerHTML = ""; // clear
-  try {
-    const { data, error } = await supabase
-      .from("photos")
-      .select("id,url,name,uploaded_at")
-      .order("uploaded_at", { ascending: false });
-    if (error) throw error;
-    if (Array.isArray(data)) {
-      data.forEach(photo => {
-        gallery.appendChild(createPhotoElement(photo));
-      });
+  gallery.innerHTML = "";
+  // if supabase available, use it
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from("photos").select("id,url,name,uploaded_at").order("uploaded_at",{ ascending: false });
+      if (error) throw error;
+      if (Array.isArray(data)) {
+        data.forEach(photo => gallery.appendChild(createPhotoElement(photo)));
+      }
+    } catch (err) {
+      console.error("Supabase load error:", err);
+      // fallback to local
+      const arr = JSON.parse(localStorage.getItem("photos_offline")||"[]");
+      arr.forEach(photo => gallery.appendChild(createPhotoElement(photo)));
+      const warn = document.createElement("div"); warn.style.color="rgba(255,255,255,0.95)"; warn.style.margin="12px"; warn.textContent = "Галерея загружена из локального хранилища (Supabase недоступен).";
+      gallery.prepend(warn);
     }
-  } catch (err) {
-    console.error("Error loading gallery:", err);
-    const errMsg = document.createElement("div");
-    errMsg.style.color = "rgba(255,255,255,0.9)";
-    errMsg.style.margin = "12px";
-    errMsg.textContent = "Не удалось загрузить галерею (смотрите консоль).";
-    gallery.appendChild(errMsg);
+  } else {
+    const arr = JSON.parse(localStorage.getItem("photos_offline")||"[]");
+    if (arr.length === 0) {
+      const hint = document.createElement("div"); hint.style.color="rgba(255,255,255,0.95)"; hint.style.margin="12px"; hint.textContent = "Пока нет фото. Загрузите через вкладку «Загрузка».";
+      gallery.appendChild(hint);
+    } else {
+      arr.forEach(photo => gallery.appendChild(createPhotoElement(photo)));
+    }
   }
 }
 
-/* Initial load */
-loadGallery();
+/* Initialize Supabase dynamically so import errors don't break layout */
+async function initSupabase(){
+  try {
+    const mod = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
+    const createClient = mod.createClient;
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // test connection by a light request (not required but helpful)
+    // Load gallery after supabase ready
+  } catch (err) {
+    console.warn("Supabase import failed — falling back to local-only mode.", err);
+    supabase = null;
+  } finally {
+    await loadGallery();
+  }
+}
 
-/* Upload handling to IMGBB + insert to Supabase */
+/* Upload flow: IMGBB -> (Supabase insert OR localStorage) -> update gallery */
 const fileInput = document.getElementById("fileInput");
 const statusDiv = document.getElementById("uploadStatus");
 
@@ -407,7 +303,6 @@ fileInput.addEventListener("change", async () => {
   if (!files.length) return;
 
   for (const file of files) {
-    // status item
     const statusItem = document.createElement("div");
     statusItem.className = "status-item";
     const left = document.createElement("div"); left.className = "status-left"; left.textContent = file.name;
@@ -415,7 +310,6 @@ fileInput.addEventListener("change", async () => {
     statusItem.appendChild(left); statusItem.appendChild(right);
     statusDiv.appendChild(statusItem);
 
-    // build form data
     const form = new FormData();
     form.append("image", file);
 
@@ -423,38 +317,54 @@ fileInput.addEventListener("change", async () => {
       await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", `https://api.imgbb.com/1/upload?key=${encodeURIComponent(IMGBB_API_KEY)}`);
-
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
             const pct = Math.round((e.loaded / e.total) * 100);
             right.textContent = pct + "%";
           }
         };
-
         xhr.onload = async () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
+          if (xhr.status >=200 && xhr.status <300) {
             try {
               const resp = JSON.parse(xhr.responseText);
               if (resp && resp.success && resp.data && resp.data.url) {
                 right.textContent = "Загружено";
-                // save to supabase
-                try {
-                  const { data, error } = await supabase
-                    .from("photos")
-                    .insert([{ url: resp.data.url, name: file.name, uploaded_at: new Date().toISOString() }])
-                    .select()
-                    .single();
-                  if (error) throw error;
-                  // add to gallery at top
-                  gallery.prepend(createPhotoElement(data));
-                } catch (dbErr) {
-                  console.error("Supabase insert error:", dbErr);
-                  right.textContent = "Ошибка записи";
+                const photoRecord = {
+                  url: resp.data.url,
+                  name: file.name,
+                  uploaded_at: new Date().toISOString()
+                };
+                // try to save to supabase if available
+                if (supabase) {
+                  try {
+                    const { data, error } = await supabase.from("photos").insert([photoRecord]).select().single();
+                    if (error) throw error;
+                    // data contains inserted record with id
+                    gallery.prepend(createPhotoElement(data));
+                  } catch (dbErr) {
+                    console.error("Supabase insert failed:", dbErr);
+                    // fallback: save to localStorage for offline viewing
+                    const arr = JSON.parse(localStorage.getItem("photos_offline")||"[]");
+                    // provide a localId to allow deletion later
+                    photoRecord.localId = "local_"+Date.now()+"_"+Math.floor(Math.random()*9999);
+                    arr.unshift(photoRecord);
+                    localStorage.setItem("photos_offline", JSON.stringify(arr));
+                    gallery.prepend(createPhotoElement(photoRecord));
+                    right.textContent = "Сохранено локально";
+                  }
+                } else {
+                  // supabase not available — save locally
+                  const arr = JSON.parse(localStorage.getItem("photos_offline")||"[]");
+                  photoRecord.localId = "local_"+Date.now()+"_"+Math.floor(Math.random()*9999);
+                  arr.unshift(photoRecord);
+                  localStorage.setItem("photos_offline", JSON.stringify(arr));
+                  gallery.prepend(createPhotoElement(photoRecord));
+                  right.textContent = "Сохранено локально";
                 }
                 resolve();
               } else {
                 right.textContent = "Ошибка";
-                reject(new Error("Bad response from imgbb"));
+                reject(new Error("Bad imgbb response"));
               }
             } catch (err) {
               right.textContent = "Ошибка";
@@ -465,24 +375,22 @@ fileInput.addEventListener("change", async () => {
             reject(new Error("HTTP " + xhr.status));
           }
         };
-
         xhr.onerror = () => { right.textContent = "Ошибка сети"; reject(new Error("Network error")); };
         xhr.send(form);
       });
     } catch (err) {
       console.error("Upload error:", err);
-      // keep status showing error
+      // keep status item showing error text for user
     }
   }
 
-  // clear input so same file can be chosen again if needed
+  // clear input
   fileInput.value = "";
 });
 
-/* Accessibility: focus first tab button initially */
-document.querySelector(".tab-btn")?.focus();
+/* start */
+initSupabase();
 
 </script>
-
 </body>
 </html>
