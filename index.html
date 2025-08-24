@@ -35,6 +35,7 @@
       background: rgba(0, 0, 0, 0.15);
       z-index: 1000;
       backdrop-filter: blur(4px);
+      padding-bottom: 6px; /* Добавил отступ снизу */
     }
 
     .tab-btn {
@@ -48,6 +49,7 @@
       transition: all 0.2s;
       font-size: 0.95rem;
       margin-top: 8px;
+      margin-bottom: 4px; /* Кнопки не прилипают к низу */
     }
 
     .tab-btn.active {
@@ -70,16 +72,18 @@
 
     /* Главная страница */
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.5rem; /* Увеличил шрифт */
       margin: 10px 0 15px;
       line-height: 1.2;
+      text-align: center; /* Точно по центру */
+      width: 100%;
     }
 
     .poem {
       font-size: 1.1rem;
       max-width: 380px;
       margin: 0 auto 25px;
-      white-space: pre-line; /* Важно для переносов */
+      white-space: pre-line;
       line-height: 1.4;
       background: rgba(0, 0, 0, 0.15);
       padding: 15px;
@@ -119,6 +123,7 @@
       text-align: center;
       color: rgba(255, 255, 255, 0.9);
       padding: 0 15px;
+      text-align: center; /* Точно по центру */
     }
 
     /* Всплывающее окно */
@@ -294,7 +299,7 @@
     /* Адаптивность */
     @media (max-width: 768px) {
       h1 {
-        font-size: 1.9rem;
+        font-size: 2.2rem;
       }
       
       .poem {
@@ -316,12 +321,13 @@
         padding: 8px 12px;
         font-size: 0.85rem;
         margin-top: 6px;
+        margin-bottom: 3px;
       }
     }
 
     @media (max-width: 480px) {
       h1 {
-        font-size: 1.7rem;
+        font-size: 2.0rem;
       }
       
       .poem {
