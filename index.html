@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Для моей Зефирки</title>
   <style>
     * {
@@ -19,7 +19,7 @@
       color: white;
       text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
       padding-top: 60px;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     /* Навигация */
@@ -34,6 +34,7 @@
       gap: 10px;
       background: rgba(0, 0, 0, 0.2);
       z-index: 1000;
+      backdrop-filter: blur(4px);
     }
 
     .tab-btn {
@@ -45,6 +46,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      font-size: 0.95rem;
     }
 
     .tab-btn.active {
@@ -56,11 +58,13 @@
     .tab {
       display: none;
       padding: 20px;
-      min-height: calc(100vh - 60px);
+      height: calc(100vh - 60px);
+      overflow: hidden;
     }
 
     .tab.active {
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
 
     /* Главная страница */
@@ -135,13 +139,21 @@
     }
 
     /* Галерея */
+    .gallery-scroll {
+      flex: 1;
+      overflow-y: auto;
+      width: 100%;
+      padding-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .gallery-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
       width: 90%;
       max-width: 1100px;
-      margin: 20px auto;
+      margin: 0 auto;
     }
 
     .photo {
@@ -149,12 +161,18 @@
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       aspect-ratio: 1;
+      transition: transform 0.2s;
+    }
+
+    .photo:hover {
+      transform: scale(1.03);
     }
 
     .photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
 
     /* Загрузка */
@@ -166,6 +184,10 @@
       max-width: 500px;
       margin: 0 auto;
       text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .upload-btn {
@@ -182,6 +204,9 @@
     #uploadStatus {
       margin-top: 15px;
       text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 5px;
     }
 
     .status-item {
@@ -223,6 +248,63 @@
       left: -8px;
       top: 0;
     }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.9rem;
+      }
+      
+      .poem {
+        font-size: 1.05rem;
+        padding: 12px;
+      }
+      
+      .main-btn {
+        padding: 10px 24px;
+        font-size: 1rem;
+      }
+      
+      .gallery-container {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+      }
+      
+      .tab-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.7rem;
+      }
+      
+      .poem {
+        font-size: 0.95rem;
+        padding: 10px;
+      }
+      
+      .main-btn {
+        padding: 9px 20px;
+        font-size: 0.95rem;
+      }
+      
+      .gallery-container {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px;
+      }
+      
+      .upload-box {
+        padding: 15px;
+      }
+      
+      footer {
+        font-size: 0.85rem;
+        padding: 0 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -259,7 +341,9 @@
 
   <!-- Галерея -->
   <div id="gallery" class="tab">
-    <div class="gallery-container" id="galleryContainer"></div>
+    <div class="gallery-scroll">
+      <div class="gallery-container" id="galleryContainer"></div>
+    </div>
   </div>
 
   <!-- Загрузка -->
@@ -283,6 +367,119 @@
     // Создаем клиент Supabase
     const { createClient } = supabase;
     const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Уникальный идентификатор пользователя
+    let userId = null;
+
+    // === ИНИЦИАЛИЗАЦИЯ АНОНИМНОЙ СЕССИИ ===
+    async function initAuth() {
+      try {
+        // Проверяем текущую сессию
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (session) {
+          // Сессия уже существует
+          userId = session.user.id;
+          console.log('Используем существующую сессию:', userId);
+        } else {
+          // Создаем новую анонимную сессию
+          const { data, error: signInError } = await supabaseClient.auth.signInWithPassword({
+            email: `${Date.now()}@example.com`,
+            password: 'anonymous_password'
+          });
+          
+          if (signInError) throw signInError;
+          
+          userId = data.user.id;
+          console.log('Создана новая анонимная сессия:', userId);
+        }
+        
+        // Загружаем счётчик
+        loadCounter();
+      } catch (err) {
+        console.error('Ошибка аутентификации:', err);
+        // Если аутентификация не удалась, используем localStorage как fallback
+        initLocalStorageCounter();
+      }
+    }
+
+    // === ЗАГРУЗКА СЧЁТЧИКА ИЗ SUPABASE ===
+    async function loadCounter() {
+      if (!userId) {
+        initLocalStorageCounter();
+        return;
+      }
+      
+      try {
+        const { data, error } = await supabaseClient
+          .from('clicks')
+          .select('count')
+          .eq('user_id', userId)
+          .single();
+        
+        if (error) {
+          if (error.code === 'PGRST116') { // Запись не найдена
+            await supabaseClient
+              .from('clicks')
+              .insert([{ user_id: userId, count: 0 }]);
+            updateCounterDisplay(0);
+          } else {
+            throw error;
+          }
+        } else {
+          updateCounterDisplay(data.count);
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки счётчика:', err);
+        initLocalStorageCounter();
+      }
+    }
+
+    // === ОБНОВЛЕНИЕ СЧЁТЧИКА ===
+    async function updateCounter(newCount) {
+      if (!userId) {
+        // Fallback на localStorage
+        localStorage.setItem('zeffirkaClicks', newCount);
+        updateCounterDisplay(newCount);
+        return;
+      }
+      
+      try {
+        const { error } = await supabaseClient
+          .from('clicks')
+          .update({ count: newCount })
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+        
+        updateCounterDisplay(newCount);
+      } catch (err) {
+        console.error('Ошибка сохранения счётчика:', err);
+        // Fallback на localStorage
+        localStorage.setItem('zeffirkaClicks', newCount);
+        updateCounterDisplay(newCount);
+      }
+    }
+
+    // === ОТОБРАЖЕНИЕ СЧЁТЧИКА ===
+    function updateCounterDisplay(count) {
+      document.getElementById('counter').textContent = count;
+    }
+
+    // === Fallback на localStorage ===
+    function initLocalStorageCounter() {
+      let count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
+      updateCounterDisplay(count);
+      
+      document.getElementById('mainBtn').addEventListener('click', () => {
+        count++;
+        localStorage.setItem('zeffirkaClicks', count);
+        updateCounterDisplay(count);
+        showToast();
+      });
+    }
 
     // === УПРАВЛЕНИЕ ВКЛАДКАМИ ===
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -306,23 +503,20 @@
     });
 
     // === СЧЁТЧИК КЛИКОВ ===
-    const counterEl = document.getElementById('counter');
-    let count = 0;
-
-    if (typeof localStorage !== 'undefined') {
-      count = parseInt(localStorage.getItem('zeffirkaClicks')) || 0;
-    }
-    counterEl.textContent = count;
-
-    document.getElementById('mainBtn').addEventListener('click', () => {
-      count++;
-      counterEl.textContent = count;
-      
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('zeffirkaClicks', count);
+    document.getElementById('mainBtn').addEventListener('click', async () => {
+      try {
+        const { data: { count } } = await supabaseClient
+          .rpc('increment_click', { user_id: userId });
+        
+        updateCounterDisplay(count);
+        showToast();
+      } catch (err) {
+        console.error('Ошибка обновления счётчика:', err);
+        // Fallback на простое увеличение
+        const currentCount = parseInt(document.getElementById('counter').textContent);
+        updateCounter(currentCount + 1);
+        showToast();
       }
-      
-      showToast();
     });
 
     // === ВСПЛЫВАЮЩЕЕ ОКНО ===
@@ -388,7 +582,7 @@
         const { data, error } = await supabaseClient
           .from('photos')
           .select('*')
-          .order('uploaded_at', { ascending: false }); // Используем uploaded_at вместо created_at
+          .order('uploaded_at', { ascending: false });
         
         if (error) throw error;
         
@@ -404,14 +598,13 @@
         galleryContainer.innerHTML = '';
         
         data.forEach(photo => {
-          // ИСПРАВЛЕНИЕ 1: Удаляем пробелы из URL
           const cleanUrl = photo.url.trim();
           
           const photoEl = document.createElement('div');
           photoEl.className = 'photo';
           
           const img = document.createElement('img');
-          img.src = cleanUrl; // Используем очищенный URL
+          img.src = cleanUrl;
           img.alt = photo.name || 'Фото';
           img.loading = 'lazy';
           
@@ -476,7 +669,6 @@
               try {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success && response.data && response.data.url) {
-                  // ИСПРАВЛЕНИЕ 2: Удаляем пробелы из полученного URL
                   const cleanImageUrl = response.data.url.trim();
                   
                   statusRight.textContent = 'Сохранение в Supabase...';
@@ -485,7 +677,7 @@
                     .from('photos')
                     .insert([{ 
                       name: file.name, 
-                      url: cleanImageUrl // Сохраняем очищенный URL
+                      url: cleanImageUrl
                     }]);
                   
                   if (error) throw error;
@@ -523,6 +715,27 @@
       }
       
       fileInput.value = '';
+    });
+
+    // === ИНИЦИАЛИЗАЦИЯ ===
+    document.addEventListener('DOMContentLoaded', () => {
+      // Фиксируем высоту body для iOS
+      function setBodyHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        document.body.style.height = `calc(var(--vh, 1vh) * 100)`;
+      }
+      
+      setBodyHeight();
+      window.addEventListener('resize', setBodyHeight);
+      
+      // Инициализируем аутентификацию
+      initAuth();
+      
+      // Если на вкладке галереи при загрузке - загружаем фото
+      if (document.getElementById('gallery').classList.contains('active')) {
+        loadGallery();
+      }
     });
   </script>
 </body>
