@@ -115,7 +115,6 @@
       text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
     }
 
-    /* Исправленный футер - СПОСОБ 1: Абсолютное центрирование */
     .footer-container {
       position: absolute;
       bottom: 20px;
@@ -302,7 +301,7 @@
       text-overflow: ellipsis;
     }
 
-    /* Пароль для удаления */
+    /* Пароль для действий */
     .password-prompt {
       position: fixed;
       top: 0;
@@ -470,7 +469,6 @@
       <div class="click-counter">Кликов: <span id="counter">0</span></div>
     </div>
     
-    <!-- Исправленный футер -->
     <div class="footer-container">
       <div class="footer-text">Если вдруг ты стала забывать, как я тебя люблю,<br>он будет здесь всегда 🌹</div>
     </div>
@@ -488,19 +486,19 @@
     <div class="upload-box">
       <h3 style="font-size: 1rem; margin-bottom: 6px;">Выбери фото для загрузки 💖</h3>
       <input type="file" id="fileInput" accept="image/*" multiple style="display: none;">
-      <div class="upload-btn">Выбрать фото</div>
+      <div class="upload-btn" id="uploadTriggerBtn">Выбрать фото</div>
       <div id="uploadStatus"></div>
     </div>
   </div>
 
   <script>
     // === НАСТРОЙКИ ===
-    const GITHUB_REPO = "твой-юзернейм/твой-репозиторий"; // ← ЗАМЕНИ НА СВОЙ!
+    const GITHUB_REPO = "avitadis/2";
     const GITHUB_BRANCH = "main";
-    const GITHUB_TOKEN = "ghp_твой_токен_сюда"; // ← ЗАМЕНИ НА СВОЙ! (scope: repo)
+    const GITHUB_TOKEN = "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";
     const DATA_FILE = "data.json";
     const IMGBB_API_KEY = "876c7823f9f0a390dbd7586dca84c168";
-    const DELETE_PASSWORD = "zeffirka123"; // ← Можешь изменить пароль здесь
+    const ACTION_PASSWORD = "loveyou"; // ← Пароль для ВСЕХ действий
 
     // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
     let currentCount = 0;
@@ -697,7 +695,6 @@
         galleryContainer.appendChild(photoEl);
       });
       
-      // Добавляем обработчики для открытия фото
       document.querySelectorAll('.photo').forEach(photo => {
         photo.addEventListener('click', (e) => {
           if (e.target.classList.contains('delete-btn')) return;
@@ -713,7 +710,6 @@
           overlay.appendChild(fullSizeImg);
           document.body.appendChild(overlay);
           
-          // Закрываем при клике
           overlay.addEventListener('click', () => {
             document.body.removeChild(overlay);
           });
@@ -731,26 +727,13 @@
       }
     }
 
-    // === ПОКАЗАТЬ ВСПЛЫВАЮЩЕЕ СООБЩЕНИЕ ===
-    function showToastMessage(text, duration = 2400) {
-      const toast = document.getElementById('toast');
-      toast.textContent = text;
-      toast.classList.remove('show');
-      void toast.offsetWidth;
-      toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, duration);
-    }
-
     // === ЗАПРОС ПАРОЛЯ ===
     function showPasswordPrompt(onSuccess) {
       const promptDiv = document.createElement('div');
       promptDiv.className = 'password-prompt';
       
       const title = document.createElement('h3');
-      title.textContent = 'Введите пароль для удаления:';
+      title.textContent = 'Введите пароль:';
       
       const input = document.createElement('input');
       input.type = 'password';
@@ -771,7 +754,7 @@
       document.body.appendChild(promptDiv);
       
       function checkPassword() {
-        if (input.value === DELETE_PASSWORD) {
+        if (input.value === ACTION_PASSWORD) {
           isPasswordVerified = true;
           document.body.removeChild(promptDiv);
           if (onSuccess) onSuccess();
@@ -784,8 +767,14 @@
       }
     }
 
-    // === ЗАГРУЗКА ФОТО ===
+    // === ЗАГРУЗКА ФОТО (ЗАЩИЩЕНА ПАРОЛЕМ) ===
     async function uploadPhoto(file) {
+      if (!isPasswordVerified) {
+        await new Promise((resolve) => {
+          showPasswordPrompt(resolve);
+        });
+      }
+
       const uploadStatus = document.getElementById('uploadStatus');
       const statusItem = document.createElement('div');
       statusItem.className = 'status-item';
@@ -866,6 +855,19 @@
       }
     }
 
+    // === ВСПЛЫВАЮЩЕЕ СООБЩЕНИЕ ===
+    function showToastMessage(text, duration = 2400) {
+      const toast = document.getElementById('toast');
+      toast.textContent = text;
+      toast.classList.remove('show');
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, duration);
+    }
+
     // === УПРАВЛЕНИЕ ВКЛАДКАМИ ===
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -941,10 +943,16 @@
 
     // === ЗАГРУЗКА ФОТО ===
     const fileInput = document.getElementById('fileInput');
-    const uploadBtn = document.querySelector('.upload-btn');
+    const uploadTriggerBtn = document.getElementById('uploadTriggerBtn');
 
-    uploadBtn.addEventListener('click', () => {
-      fileInput.click();
+    uploadTriggerBtn.addEventListener('click', () => {
+      if (!isPasswordVerified) {
+        showPasswordPrompt(() => {
+          fileInput.click();
+        });
+      } else {
+        fileInput.click();
+      }
     });
 
     fileInput.addEventListener('change', async () => {
@@ -962,7 +970,6 @@
 
     // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', () => {
-      // Фиксируем высоту body для iOS
       function setBodyHeight() {
         const vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -972,10 +979,8 @@
       setBodyHeight();
       window.addEventListener('resize', setBodyHeight);
       
-      // Загружаем данные
       loadData();
       
-      // Если на вкладке галереи при загрузке - загружаем фото
       if (document.getElementById('gallery').classList.contains('active')) {
         loadGallery();
       }
